@@ -1,49 +1,42 @@
+import { Leaf } from "lucide-react";
 import { useSettings } from "@/hooks/use-store";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  /** Extra classes for the wrapper element. */
   className?: string;
-  /** Tailwind height utility used when a logo image is present. */
   logoClassName?: string;
-  /** Classes applied to the store name text. */
   textClassName?: string;
-  /** Hide the store name and show only the logo (when a logo exists). */
   logoOnly?: boolean;
 };
 
-/**
- * Single source of truth for the store identity: shows the uploaded logo from
- * Admin → Settings → Branding alongside the store name, and falls back to the
- * name alone when no logo is configured.
- */
-export function BrandMark({
-  className,
-  logoClassName = "h-7 md:h-8",
-  textClassName = "font-serif-display text-xl leading-none tracking-tight md:text-2xl",
-  logoOnly = false,
-}: Props) {
+export function BrandMark({ className, logoClassName = "h-8 sm:h-9", textClassName }: Props) {
   const settings = useSettings();
+  const name = settings.storeName || "PUREBENGAL";
 
   return (
-    <span className={cn("inline-flex min-w-0 items-center gap-2 md:gap-2.5", className)}>
-      {settings.logoUrl && (
-        <span
-          className={cn(
-            "aspect-square shrink-0 overflow-hidden rounded-full bg-muted",
-            logoClassName,
-          )}
-        >
-          <img
-            src={settings.logoUrl}
-            alt={settings.storeName}
-            className="h-full w-full object-cover"
-          />
+    <span className={cn("inline-flex min-w-0 items-center gap-2", className)}>
+      {settings.logoUrl ? (
+        <span className={cn("shrink-0 overflow-hidden rounded-md", logoClassName)}>
+          <img src={settings.logoUrl} alt={name} className="h-full w-full object-cover" />
+        </span>
+      ) : (
+        <span className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-[#0B2E13] text-[#7CB342] shadow-xs">
+          <Leaf className="h-5 w-5 fill-[#7CB342]/20" />
         </span>
       )}
-      {!(settings.logoUrl && logoOnly) && (
-        <span className={cn("truncate uppercase", textClassName)}>{settings.storeName}</span>
-      )}
+      <div className="flex flex-col justify-center min-w-0">
+        <span
+          className={cn(
+            "truncate text-base sm:text-lg font-black tracking-tight text-[#0B2E13] uppercase leading-none dark:text-white",
+            textClassName,
+          )}
+        >
+          {name}
+        </span>
+        <span className="text-[9px] font-bold tracking-widest text-[#7CB342] uppercase leading-tight">
+          NATURE'S GOODNESS
+        </span>
+      </div>
     </span>
   );
 }

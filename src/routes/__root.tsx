@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/context/cart";
+import { LanguageProvider } from "@/context/language";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MobileBottomNav } from "@/components/mobile-bottom-nav";
@@ -82,13 +83,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Trikon Clothing — Premium Menswear in Bangladesh" },
+      { title: "PureBengal — Authentic Organic Food Store in Bangladesh" },
       {
         name: "description",
         content:
-          "Trikon Clothing sells premium men's t-shirts, shirts, polos, shorts and boxers in Bangladesh with cash on delivery.",
+          "PureBengal delivers 100% pure organic food, Sundarban raw honey, wood-pressed mustard oil, pure ghee, spices & fresh produce across Bangladesh with Cash on Delivery.",
       },
-      { name: "author", content: "Trikon Clothing" },
+      { name: "author", content: "PureBengal Organic" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -98,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
       },
     ],
   }),
@@ -160,21 +161,23 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <div className="flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1 pb-14 md:pb-0">
-            {/* Required: nested routes render here. */}
-            <Outlet />
-          </main>
-          <SiteFooter />
-          <MobileBottomNav />
-          <WhatsappButton />
-          <DynamicTitle />
-          <DynamicFavicon />
-        </div>
-        <Toaster position="top-center" />
-      </CartProvider>
+      <LanguageProvider>
+        <CartProvider>
+          <div className="flex min-h-screen flex-col">
+            <SiteHeader />
+            <main className="flex-1 pb-14 md:pb-0">
+              {/* Required: nested routes render here. */}
+              <Outlet />
+            </main>
+            <SiteFooter />
+            <MobileBottomNav />
+            <WhatsappButton />
+            <DynamicTitle />
+            <DynamicFavicon />
+          </div>
+          <Toaster position="top-center" />
+        </CartProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
