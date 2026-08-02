@@ -71,7 +71,10 @@ const STATUS_COLOR: Record<string, string> = {
 function AdminDashboardPage() {
   const stats = useQuery({ queryKey: ["admin-stats"], queryFn: fetchAdminStats });
   const lowStock = useQuery({ queryKey: ["admin-low-stock"], queryFn: () => fetchLowStock(5) });
-  const recent = useQuery({ queryKey: ["admin-recent-orders"], queryFn: () => fetchRecentOrders(8) });
+  const recent = useQuery({
+    queryKey: ["admin-recent-orders"],
+    queryFn: () => fetchRecentOrders(8),
+  });
   const sales = useQuery({ queryKey: ["admin-sales-series"], queryFn: () => fetchSalesSeries(30) });
   const best = useQuery({ queryKey: ["admin-best-sellers"], queryFn: () => fetchBestSellers(5) });
 
@@ -79,14 +82,54 @@ function AdminDashboardPage() {
   const lowStockCount = (lowStock.data ?? []).filter((p) => p.stock > 0).length;
 
   const cards = [
-    { label: "Total orders", value: s ? String(s.totalOrders) : "—", Icon: ShoppingCart, tone: "neutral" as const },
-    { label: "Pending orders", value: s ? String(s.pendingOrders) : "—", Icon: Clock, tone: "warning" as const },
-    { label: "Delivered revenue", value: s ? formatBDT(Number(s.revenue)) : "—", Icon: TrendingUp, tone: "success" as const },
-    { label: "Active products", value: s ? `${s.activeProducts}/${s.totalProducts}` : "—", Icon: Package, tone: "accent" as const },
-    { label: "Out of stock", value: s ? String(s.outOfStock) : "—", Icon: AlertTriangle, tone: "danger" as const },
-    { label: "Low stock", value: lowStock.data ? String(lowStockCount) : "—", Icon: Boxes, tone: "warning" as const },
-    { label: "Categories", value: s ? String(s.totalCategories) : "—", Icon: Tags, tone: "neutral" as const },
-    { label: "Reviews awaiting", value: s ? String(s.pendingReviews) : "—", Icon: MessageSquare, tone: "info" as const },
+    {
+      label: "Total orders",
+      value: s ? String(s.totalOrders) : "—",
+      Icon: ShoppingCart,
+      tone: "neutral" as const,
+    },
+    {
+      label: "Pending orders",
+      value: s ? String(s.pendingOrders) : "—",
+      Icon: Clock,
+      tone: "warning" as const,
+    },
+    {
+      label: "Delivered revenue",
+      value: s ? formatBDT(Number(s.revenue)) : "—",
+      Icon: TrendingUp,
+      tone: "success" as const,
+    },
+    {
+      label: "Active products",
+      value: s ? `${s.activeProducts}/${s.totalProducts}` : "—",
+      Icon: Package,
+      tone: "accent" as const,
+    },
+    {
+      label: "Out of stock",
+      value: s ? String(s.outOfStock) : "—",
+      Icon: AlertTriangle,
+      tone: "danger" as const,
+    },
+    {
+      label: "Low stock",
+      value: lowStock.data ? String(lowStockCount) : "—",
+      Icon: Boxes,
+      tone: "warning" as const,
+    },
+    {
+      label: "Categories",
+      value: s ? String(s.totalCategories) : "—",
+      Icon: Tags,
+      tone: "neutral" as const,
+    },
+    {
+      label: "Reviews awaiting",
+      value: s ? String(s.pendingReviews) : "—",
+      Icon: MessageSquare,
+      tone: "info" as const,
+    },
   ];
 
   const statusData = ORDER_STATUSES.map((status) => ({
@@ -241,7 +284,10 @@ function AdminDashboardPage() {
           {recent.isPending ? (
             <TableSkeleton rows={5} />
           ) : recent.isError ? (
-            <AdminError message={(recent.error as Error).message} onRetry={() => recent.refetch()} />
+            <AdminError
+              message={(recent.error as Error).message}
+              onRetry={() => recent.refetch()}
+            />
           ) : (recent.data ?? []).length === 0 ? (
             <AdminEmpty title="No orders yet" description="New orders will show up here." />
           ) : (

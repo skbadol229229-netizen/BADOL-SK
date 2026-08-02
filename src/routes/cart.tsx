@@ -8,12 +8,12 @@ import { useSettings } from "@/hooks/use-store";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Your Cart — Trikon Clothing" },
+      { title: "Your Shopping Cart — PureBengal Organic" },
       {
         name: "description",
-        content: "Review your Trikon cart before checking out with cash on delivery.",
+        content: "Review your organic harvest items before checking out with cash on delivery.",
       },
-      { property: "og:title", content: "Your Cart — Trikon Clothing" },
+      { property: "og:title", content: "Your Shopping Cart — PureBengal Organic" },
       { property: "og:description", content: "Review your items and continue to checkout." },
       { name: "robots", content: "noindex" },
     ],
@@ -49,10 +49,7 @@ function CartPage() {
             title="Your bag is empty"
             description="Add a few essentials and check out with cash on delivery."
             action={
-              <Link
-                to="/shop"
-                className="btn btn-solid"
-              >
+              <Link to="/shop" className="btn btn-solid">
                 Start shopping
               </Link>
             }
@@ -66,7 +63,10 @@ function CartPage() {
             {lines.map((line) => {
               const key = lineKey(line);
               return (
-                <li key={key} className="grid grid-cols-[80px_minmax(0,1fr)] gap-4 py-5 md:grid-cols-[96px_minmax(0,1fr)]">
+                <li
+                  key={key}
+                  className="grid grid-cols-[80px_minmax(0,1fr)] gap-4 py-5 md:grid-cols-[96px_minmax(0,1fr)]"
+                >
                   <Link to="/product/$slug" params={{ slug: line.slug }} className="shrink-0">
                     <img
                       src={line.image}
@@ -152,16 +152,10 @@ function CartPage() {
                 <dd>{formatBDT(subtotal + storeSettings.deliveryInsideDhaka)}</dd>
               </div>
             </dl>
-            <Link
-              to="/checkout"
-              className="btn btn-solid btn-block mt-6"
-            >
+            <Link to="/checkout" className="btn btn-solid btn-block mt-6">
               Proceed to checkout
             </Link>
-            <Link
-              to="/shop"
-              className="btn btn-outline btn-block mt-3"
-            >
+            <Link to="/shop" className="btn btn-outline btn-block mt-3">
               Continue shopping
             </Link>
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground">

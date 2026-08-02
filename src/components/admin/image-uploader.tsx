@@ -16,8 +16,14 @@ type Props = {
   disabled?: boolean;
 };
 
-export function ImageUploader({ value, onChange, aspect = "aspect-video", previewClassName, assistiveText, disabled }: Props & { assistiveText?: string }) {
-
+export function ImageUploader({
+  value,
+  onChange,
+  aspect = "aspect-video",
+  previewClassName,
+  assistiveText,
+  disabled,
+}: Props & { assistiveText?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const [stage, setStage] = useState<UploadStage>("compressing");
@@ -55,7 +61,6 @@ export function ImageUploader({ value, onChange, aspect = "aspect-video", previe
     }
   }
 
-
   return (
     <div>
       <input
@@ -75,7 +80,6 @@ export function ImageUploader({ value, onChange, aspect = "aspect-video", previe
               previewClassName,
             )}
           >
-
             <img src={value.url} alt="" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -94,7 +98,6 @@ export function ImageUploader({ value, onChange, aspect = "aspect-video", previe
                 onChange({ url: "", publicId: "" });
                 setSavings(null);
                 setError(null);
-
               }}
               className="a-btn a-btn-outline"
             >

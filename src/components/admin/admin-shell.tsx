@@ -85,7 +85,6 @@ export function AdminShell({
     </span>
   );
 
-
   const { data: isAdmin, isPending } = useQuery({
     queryKey: ["admin-session"],
     queryFn: checkAdmin,
@@ -190,7 +189,9 @@ export function AdminShell({
       >
         <div className="flex h-14 items-center gap-2 border-b border-border px-3">
           {brandBadge}
-          <span className={`min-w-0 truncate text-sm font-semibold ${labels}`}>{storeName} Admin</span>
+          <span className={`min-w-0 truncate text-sm font-semibold ${labels}`}>
+            {storeName} Admin
+          </span>
         </div>
         {navList(rail)}
         {footerLinks(rail)}

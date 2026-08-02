@@ -51,10 +51,7 @@ export function ProductForm({
   const set = (patch: Partial<ProductInput>) => onChange({ ...form, ...patch });
 
   const previewSlug = form.slug.trim() || slugify(form.name);
-  const sizeOptions = useMemo(
-    () => [...new Set([...BASE_SIZES, ...form.sizes])],
-    [form.sizes],
-  );
+  const sizeOptions = useMemo(() => [...new Set([...BASE_SIZES, ...form.sizes])], [form.sizes]);
 
   function toggleSize(size: string) {
     set({
@@ -167,7 +164,10 @@ export function ProductForm({
                 />
               </Field>
               <div className="md:col-span-2">
-                <Field label="Short description" hint="One or two lines used on cards and previews.">
+                <Field
+                  label="Short description"
+                  hint="One or two lines used on cards and previews."
+                >
                   <textarea
                     rows={3}
                     value={form.shortDescription}
@@ -211,8 +211,9 @@ export function ProductForm({
                         {formatBDT(form.regularPrice)}
                       </span>{" "}
                       <span className="a-badge a-badge-accent ml-1">
-                        {Math.round(((form.regularPrice - form.salePrice) / form.regularPrice) * 100) ||
-                          0}
+                        {Math.round(
+                          ((form.regularPrice - form.salePrice) / form.regularPrice) * 100,
+                        ) || 0}
                         % off
                       </span>
                     </>
@@ -430,7 +431,12 @@ export function ProductForm({
           >
             Save as draft
           </button>
-          <button type="submit" form="product-form" disabled={saving} className="a-btn a-btn-primary">
+          <button
+            type="submit"
+            form="product-form"
+            disabled={saving}
+            className="a-btn a-btn-primary"
+          >
             {saving && <Spinner />}
             {editing ? "Save changes" : "Create product"}
           </button>

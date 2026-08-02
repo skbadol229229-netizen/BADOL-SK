@@ -32,16 +32,10 @@ function NotFoundComponent() {
           The page may have moved, or the link is no longer valid.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link
-            to="/"
-            className="btn btn-solid"
-          >
+          <Link to="/" className="btn btn-solid">
             Back to home
           </Link>
-          <Link
-            to="/shop"
-            className="btn btn-outline"
-          >
+          <Link to="/shop" className="btn btn-outline">
             Shop all products
           </Link>
         </div>
@@ -74,10 +68,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           >
             Try again
           </button>
-          <a
-            href="/"
-            className="btn btn-outline"
-          >
+          <a href="/" className="btn btn-outline">
             Go home
           </a>
         </div>
@@ -109,7 +100,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap",
       },
-      
     ],
   }),
   shellComponent: RootShell,

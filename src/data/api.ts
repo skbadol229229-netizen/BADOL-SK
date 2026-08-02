@@ -130,7 +130,9 @@ export function mapSettings(row: Row | null): StoreSettings {
 
 export async function fetchCategories(): Promise<Category[]> {
   try {
-    const rows = await queryRows("SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC");
+    const rows = await queryRows(
+      "SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC",
+    );
     if (!rows || rows.length === 0) return defaultCategories;
     return rows.map(mapCategory);
   } catch {
@@ -266,7 +268,7 @@ export async function fetchRelated(product: Product): Promise<Product[]> {
   try {
     const rows = await queryRows(
       "SELECT * FROM products WHERE active = 1 AND category_slug = ? AND id != ? LIMIT 4",
-      [product.categorySlug, product.id]
+      [product.categorySlug, product.id],
     );
     if (!rows || rows.length === 0) {
       return defaultProducts
@@ -285,7 +287,7 @@ export async function fetchReviews(slug: string): Promise<Review[]> {
   try {
     const rows = await queryRows(
       "SELECT * FROM reviews WHERE product_slug = ? AND approved = 1 ORDER BY review_date DESC",
-      [slug]
+      [slug],
     );
     if (!rows) return [];
     return rows.map(mapReview);

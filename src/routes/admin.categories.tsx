@@ -38,7 +38,10 @@ const empty: CategoryInput = {
 };
 
 function slugify(v: string) {
-  return v.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return v
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function AdminCategoriesPage() {

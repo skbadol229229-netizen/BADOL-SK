@@ -16,16 +16,16 @@ export function SiteFooter() {
           <div className="max-w-sm">
             <BrandMark />
             <p className="type-small mt-3 text-muted-foreground">
-              Considered menswear made for Bangladesh — heavier cottons, cleaner cuts, honest
-              pricing.
+              Pure, farm-fresh organic food for Bangladesh — certified pesticide-free vegetables,
+              seasonal fruits, raw honey, and fresh dairy.
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <p className="label-caps text-muted-foreground">Cash on delivery</p>
+            <p className="label-caps text-foreground font-medium">Eco Cold-Chain Delivery</p>
             <p className="type-small text-foreground">
-              Inside Dhaka ৳70 · 1–2 days
+              Inside Dhaka ৳60 · Express delivery
               <span className="mx-2 text-border">|</span>
-              Outside Dhaka ৳120 · 2–4 days
+              Outside Dhaka ৳120 · Refrigerated packaging
             </p>
           </div>
         </div>

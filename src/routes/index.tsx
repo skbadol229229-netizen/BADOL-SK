@@ -10,23 +10,22 @@ import { useCategories, useSettings } from "@/hooks/use-store";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Trikon Clothing — Premium Menswear in Bangladesh" },
+      { title: "GreenHarvest — Farm-Fresh Organic Food Store" },
       {
         name: "description",
         content:
-          "Heavyweight tees, oxford shirts, polos, shorts and boxers for men. Cash on delivery across Bangladesh, delivery in 1–4 days.",
+          "Order 100% certified organic vegetables, farm fruits, pure raw Sundarban honey, pasture milk, and natural pantry essentials delivered fresh in Dhaka.",
       },
-      { property: "og:title", content: "Trikon Clothing — Premium Menswear in Bangladesh" },
+      { property: "og:title", content: "GreenHarvest — Farm-Fresh Organic Food Store" },
       {
         property: "og:description",
         content:
-          "Considered menswear made for Bangladesh. Cash on delivery, 7 day exchange, nationwide shipping.",
+          "Fresh pesticide-free produce direct from local organic farms. Cold-chain delivery, cash on delivery.",
       },
     ],
   }),
   component: HomePage,
 });
-
 
 function HomePage() {
   const storeSettings = useSettings();
@@ -43,59 +42,86 @@ function HomePage() {
   });
   const hero = banners?.find((b) => b.image || b.mobileImage) ?? null;
 
-
   const trust = [
     {
       Icon: Truck,
-      title: "Fast delivery",
-      body: `${storeSettings.deliveryTimeInside} inside Dhaka, ${storeSettings.deliveryTimeOutside} outside.`,
+      title: "Cold-chain fresh delivery",
+      body: `${storeSettings.deliveryTimeInside} in eco-insulated bags.`,
     },
-    { Icon: Banknote, title: "Cash on delivery", body: "Pay the courier when your parcel arrives." },
+    { Icon: Banknote, title: "Cash on delivery", body: "Pay when your fresh produce arrives." },
     {
       Icon: RefreshCw,
-      title: `${storeSettings.exchangeWindowDays} day exchange`,
-      body: "Wrong size? Exchange it, unworn with tags.",
+      title: "100% Freshness Guarantee",
+      body: "Unsatisfied with produce quality? Instant hassle-free replacement.",
     },
-    { Icon: ShieldCheck, title: "Real support", body: `${storeSettings.supportPhone}, 10am-8pm.` },
+    {
+      Icon: ShieldCheck,
+      title: "Customer Support",
+      body: `${storeSettings.supportPhone}, 8am-9pm.`,
+    },
   ];
 
   return (
     <div>
       {hero && (
-      <section className="relative">
-        <AppImage
-          src={hero.image}
-          mobileSrc={hero.mobileImage || undefined}
-          alt={hero.title}
-          width={1920}
-          height={1200}
-          eager
-          className="h-[66vh] max-h-[720px] min-h-[430px] w-full object-cover object-[62%_18%] md:h-[74vh] md:object-[center_32%]"
-        />
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-background via-background/75 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0">
-          <Container className="pb-10 md:pb-16">
-            <div className="max-w-[16ch] md:max-w-md">
-              <p className="label-caps text-foreground/75">{hero.subtitle}</p>
-              <h1 className="type-display mt-3">{hero.title}</h1>
-              <a href={hero.ctaHref || "/shop"} className="btn btn-solid mt-7">
-                {hero.ctaLabel || "Shop the collection"}
-              </a>
-            </div>
-          </Container>
-        </div>
-      </section>
+        <section className="relative overflow-hidden bg-muted">
+          <AppImage
+            src={hero.image}
+            mobileSrc={hero.mobileImage || undefined}
+            alt={hero.title}
+            width={1920}
+            height={1200}
+            eager
+            className="h-[60vh] max-h-[680px] min-h-[420px] w-full object-cover object-center md:h-[72vh]"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-t from-background via-background/65 to-black/30"
+          />
+          <div className="absolute inset-0 flex items-end">
+            <Container className="pb-10 md:pb-16 lg:pb-20">
+              <div className="max-w-2xl">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/90 px-3.5 py-1 text-xs font-semibold text-primary-foreground backdrop-blur-xs">
+                  🌱 100% Certified Organic • Chemical-Free Produce
+                </span>
+                <h1 className="type-display mt-3 text-white drop-shadow-sm sm:mt-4">
+                  {hero.title}
+                </h1>
+                <p className="mt-3 text-sm text-white/90 sm:text-base md:mt-4 md:max-w-xl">
+                  {hero.subtitle}
+                </p>
+                <div className="mt-6 flex flex-wrap gap-4 md:mt-8">
+                  <a
+                    href={hero.ctaHref || "/shop"}
+                    className="btn btn-solid shadow-md hover:scale-[1.02] transition-transform"
+                  >
+                    {hero.ctaLabel || "Shop Organic Harvest"}
+                  </a>
+                  <Link
+                    to="/about"
+                    className="btn btn-outline bg-background/80 backdrop-blur-xs hover:bg-background"
+                  >
+                    Our Organic Guarantee
+                  </Link>
+                </div>
+              </div>
+            </Container>
+          </div>
+        </section>
       )}
 
       <Container className="section-y">
-        <SectionHeading title="Shop by Category" action={{ label: "Shop all", to: "/shop" }} />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
+        <SectionHeading
+          title="Shop by Category"
+          action={{ label: "View all categories", to: "/shop" }}
+        />
+        <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5 md:gap-5">
           {categories.map((c) => (
             <Link
               key={c.slug}
               to="/category/$slug"
               params={{ slug: c.slug }}
-              className="group relative block aspect-[4/5] min-w-0 overflow-hidden rounded-[18px] bg-secondary md:aspect-[3/4]"
+              className="group relative block aspect-[4/5] min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-secondary shadow-xs transition-all duration-300 hover:border-primary hover:shadow-md"
             >
               {c.image && (
                 <AppImage
@@ -103,16 +129,21 @@ function HomePage() {
                   alt={c.name}
                   width={800}
                   height={1000}
-                  className="h-full w-full object-cover group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                 />
               )}
               <span
                 aria-hidden
-                className="absolute inset-0 bg-linear-to-t from-black/60 via-black/15 to-transparent"
+                className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent transition-opacity group-hover:opacity-90"
               />
-              <span className="absolute inset-x-2 bottom-4 text-center text-[13px] font-semibold tracking-wide text-white uppercase md:bottom-6 md:text-base">
-                {c.name}
-              </span>
+              <div className="absolute inset-x-3 bottom-3 flex flex-col items-center text-center text-white sm:bottom-4">
+                <span className="text-xs font-bold tracking-wide text-white drop-shadow-xs sm:text-sm lg:text-base">
+                  {c.name}
+                </span>
+                <span className="mt-1 hidden text-[11px] text-white/80 transition-opacity group-hover:block sm:inline-block">
+                  Explore Collection →
+                </span>
+              </div>
             </Link>
           ))}
         </div>
@@ -150,14 +181,15 @@ function HomePage() {
         <div>
           <div className="flex items-center px-4 py-12 md:px-14 md:py-20">
             <div className="max-w-md">
-              <p className="label-caps text-muted-foreground">The Trikon standard</p>
-              <h2 className="type-h2 mt-3">Heavier cotton. Cleaner cuts.</h2>
+              <p className="label-caps text-muted-foreground">The GreenHarvest Standard</p>
+              <h2 className="type-h2 mt-3">Pure Soil. Pure Nutrition.</h2>
               <p className="type-body mt-4 text-muted-foreground">
-                We work with a small number of mills, buy heavier fabric than the market average,
-                and keep the range tight. Fewer products, made properly.
+                We work directly with certified organic farms to bring chemical-free vegetables,
+                seasonal fruits, raw Sundarban honey, and unadulterated pasture dairy straight to
+                your table.
               </p>
               <Link to="/about" className="btn btn-outline mt-7">
-                Our story
+                Our harvest story
               </Link>
             </div>
           </div>

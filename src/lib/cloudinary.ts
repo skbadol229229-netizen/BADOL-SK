@@ -50,7 +50,11 @@ export async function uploadToCloudinary(
   const endpoint = cloudinaryUploadUrl();
 
   onStage?.("compressing");
-  const { file: payloadFile, originalBytes, compressedBytes } = await compressImage(file, {
+  const {
+    file: payloadFile,
+    originalBytes,
+    compressedBytes,
+  } = await compressImage(file, {
     maxBytes: TARGET_MAX_BYTES,
   });
   onStage?.("uploading");
@@ -58,7 +62,6 @@ export async function uploadToCloudinary(
   const body = new FormData();
   body.append("file", payloadFile);
   body.append("upload_preset", UPLOAD_PRESET as string);
-
 
   return new Promise<CloudinaryImage>((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -97,7 +100,6 @@ export async function uploadToCloudinary(
         originalBytes,
         compressedBytes,
       });
-
     };
 
     xhr.send(body);

@@ -46,7 +46,6 @@ export function BrandMark({
       )}
     </span>
   );
-
 }
 
 export function useStoreName() {

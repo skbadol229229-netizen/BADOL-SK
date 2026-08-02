@@ -328,12 +328,7 @@ function AdminProductsPage() {
           </div>
         )}
 
-        <Pager
-          page={current}
-          pageCount={pageCount}
-          total={filtered.length}
-          onPage={setPage}
-        />
+        <Pager page={current} pageCount={pageCount} total={filtered.length} onPage={setPage} />
       </SectionCard>
 
       {form && (

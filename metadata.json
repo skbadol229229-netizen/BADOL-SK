@@ -1,6 +1,6 @@
 {
-  "name": "Dhaka Threads",
-  "description": "Premium menswear e-commerce storefront with catalog, cart, checkout, and admin dashboard.",
+  "name": "GreenHarvest",
+  "description": "Premium organic food store featuring farm-fresh vegetables, seasonal fruits, raw honey, and artisanal organic pantry essentials.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

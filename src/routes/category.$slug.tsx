@@ -13,7 +13,10 @@ export const Route = createFileRoute("/category/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Category not found — Trikon Clothing" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Category not found — Trikon Clothing" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const { category } = loaderData;
@@ -38,10 +41,7 @@ function CategoryNotFound() {
       <p className="mt-3 text-sm text-muted-foreground">
         This category may have been renamed or removed.
       </p>
-      <Link
-        to="/shop"
-        className="mt-8 btn btn-solid"
-      >
+      <Link to="/shop" className="mt-8 btn btn-solid">
         Shop all products
       </Link>
     </Container>

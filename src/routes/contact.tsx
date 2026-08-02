@@ -62,8 +62,7 @@ function ContactPage() {
     toast.success("Message sent", { description: "We usually reply within one working day." });
   }
 
-  const inputClass = (invalid?: string) =>
-    `field-input ${invalid ? "field-invalid" : ""}`;
+  const inputClass = (invalid?: string) => `field-input ${invalid ? "field-invalid" : ""}`;
 
   return (
     <Container className="py-10 md:py-16">
@@ -158,11 +157,7 @@ function ContactPage() {
             {errors.message && <p className="field-error">{errors.message}</p>}
           </div>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn btn-solid btn-block mt-6"
-          >
+          <button type="submit" disabled={submitting} className="btn btn-solid btn-block mt-6">
             {submitting ? "Sending…" : "Send message"}
           </button>
 

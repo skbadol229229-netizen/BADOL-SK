@@ -2,12 +2,16 @@ import { createClient } from "@libsql/client/web";
 
 const rawUrl =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_TURSO_DATABASE_URL) ||
-  (typeof process !== "undefined" ? process.env?.VITE_TURSO_DATABASE_URL || process.env?.TURSO_DATABASE_URL : "") ||
+  (typeof process !== "undefined"
+    ? process.env?.VITE_TURSO_DATABASE_URL || process.env?.TURSO_DATABASE_URL
+    : "") ||
   "";
 
 const rawToken =
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_TURSO_AUTH_TOKEN) ||
-  (typeof process !== "undefined" ? process.env?.VITE_TURSO_AUTH_TOKEN || process.env?.TURSO_AUTH_TOKEN : "") ||
+  (typeof process !== "undefined"
+    ? process.env?.VITE_TURSO_AUTH_TOKEN || process.env?.TURSO_AUTH_TOKEN
+    : "") ||
   "";
 
 function normalizeUrl(u: string): string {
@@ -27,7 +31,7 @@ export const turso = createClient({
 
 export async function queryRows<T = Record<string, unknown>>(
   sql: string,
-  args: (string | number | boolean | null)[] = []
+  args: (string | number | boolean | null)[] = [],
 ): Promise<T[]> {
   if (!isTursoConfigured) return [];
   const res = await turso.execute({ sql, args });
@@ -36,7 +40,7 @@ export async function queryRows<T = Record<string, unknown>>(
 
 export async function queryRow<T = Record<string, unknown>>(
   sql: string,
-  args: (string | number | boolean | null)[] = []
+  args: (string | number | boolean | null)[] = [],
 ): Promise<T | null> {
   if (!isTursoConfigured) return null;
   const res = await turso.execute({ sql, args });
@@ -46,18 +50,18 @@ export async function queryRow<T = Record<string, unknown>>(
 
 export async function execSql(
   sql: string,
-  args: (string | number | boolean | null)[] = []
+  args: (string | number | boolean | null)[] = [],
 ): Promise<void> {
   if (!isTursoConfigured) return;
   await turso.execute({ sql, args });
 }
 
 export async function execBatch(
-  statements: { sql: string; args?: (string | number | boolean | null)[] }[]
+  statements: { sql: string; args?: (string | number | boolean | null)[] }[],
 ): Promise<void> {
   if (!isTursoConfigured) return;
   await turso.batch(
     statements.map((s) => ({ sql: s.sql, args: s.args ?? [] })),
-    "write"
+    "write",
   );
 }

@@ -10,7 +10,6 @@ import { useDebounced } from "@/hooks/use-debounced";
 import { fetchProducts, priceOf } from "@/data/api";
 import { formatBDT } from "@/lib/format";
 
-
 export function SiteHeader() {
   const { count } = useCart();
   const categories = useCategories();
@@ -61,7 +60,6 @@ export function SiteHeader() {
     navigate({ to: "/search", search: { q } });
   }
 
-
   const desktopLinkClass =
     "label-caps text-muted-foreground transition-colors hover:text-foreground";
   const mobileLinkClass = "flex min-h-[52px] items-center border-b border-border text-base";
@@ -69,7 +67,22 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[72px] md:px-8">
+      {/* Top Announcement Bar */}
+      <div className="bg-primary px-4 py-1.5 text-center text-[11px] font-medium text-primary-foreground sm:text-xs">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2">
+          <span className="hidden sm:inline">
+            🌱 100% Certified Organic Food Sourced Directly From Farmers
+          </span>
+          <span className="sm:hidden">🌱 100% Organic Food • Express Delivery</span>
+          <div className="flex items-center gap-3 text-[11px]">
+            <span>📞 Hotline: +880 1711-223344</span>
+            <span className="hidden md:inline">|</span>
+            <span className="hidden md:inline">🚚 Cash on Delivery Nationwide</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 md:h-[72px] md:px-8">
         <div className="flex min-w-0 items-center gap-1">
           <button
             type="button"
@@ -78,15 +91,19 @@ export function SiteHeader() {
             onClick={() => setMenuOpen(true)}
             className="-ml-2 grid h-11 w-11 shrink-0 place-items-center md:hidden"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5 text-foreground" />
           </button>
           <Link to="/" className="min-w-0">
             <BrandMark />
           </Link>
         </div>
 
-        <nav className="hidden min-w-0 items-center justify-center gap-6 md:flex lg:gap-7">
-          <Link to="/shop" className={desktopLinkClass} activeProps={{ className: "text-foreground" }}>
+        <nav className="hidden min-w-0 items-center justify-center gap-5 md:flex lg:gap-7">
+          <Link
+            to="/shop"
+            className={desktopLinkClass}
+            activeProps={{ className: "text-foreground font-semibold" }}
+          >
             Shop
           </Link>
           {categories.map((c) => (
@@ -95,28 +112,32 @@ export function SiteHeader() {
               to="/category/$slug"
               params={{ slug: c.slug }}
               className={desktopLinkClass}
-              activeProps={{ className: "text-foreground" }}
+              activeProps={{ className: "text-foreground font-semibold" }}
             >
               {c.name}
             </Link>
           ))}
-          <Link to="/about" className={desktopLinkClass} activeProps={{ className: "text-foreground" }}>
+          <Link
+            to="/about"
+            className={desktopLinkClass}
+            activeProps={{ className: "text-foreground font-semibold" }}
+          >
             About
           </Link>
           <Link
             to="/contact"
             className={desktopLinkClass}
-            activeProps={{ className: "text-foreground" }}
+            activeProps={{ className: "text-foreground font-semibold" }}
           >
             Contact
           </Link>
         </nav>
 
-        <div className="-mr-2 flex items-center justify-end md:mr-0">
-          <div ref={searchRef} className="relative hidden lg:block">
-            <form onSubmit={submitSearch} className="flex items-center">
+        <div className="-mr-2 flex items-center justify-end gap-1 md:mr-0">
+          <div ref={searchRef} className="relative hidden md:block">
+            <form onSubmit={submitSearch} className="relative flex items-center">
               <label htmlFor="site-search" className="sr-only">
-                Search products
+                Search organic products
               </label>
               <input
                 id="site-search"
@@ -130,10 +151,10 @@ export function SiteHeader() {
                   if (e.key === "Escape") setSuggestOpen(false);
                 }}
                 autoComplete="off"
-                placeholder="Search"
-                className="h-10 w-40 border-b border-border bg-transparent px-1 text-sm outline-none placeholder:text-muted-foreground focus:border-foreground"
+                placeholder="Search honey, ghee, spices..."
+                className="h-9 w-48 rounded-full border border-border bg-secondary/70 pl-3.5 pr-8 text-xs outline-none transition-all placeholder:text-muted-foreground focus:w-64 focus:border-primary focus:bg-background lg:w-56"
               />
-              {query && (
+              {query ? (
                 <button
                   type="button"
                   aria-label="Clear search"
@@ -141,46 +162,51 @@ export function SiteHeader() {
                     setQuery("");
                     setSuggestOpen(false);
                   }}
-                  className="grid h-11 w-8 place-items-center text-muted-foreground hover:text-foreground"
+                  className="absolute right-2 grid h-7 w-7 place-items-center text-muted-foreground hover:text-foreground"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
+              ) : (
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="absolute right-2 grid h-7 w-7 place-items-center text-muted-foreground"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                </button>
               )}
-              <button
-                type="submit"
-                aria-label="Search"
-                className="grid h-11 w-11 place-items-center"
-              >
-                <Search className="h-4 w-4" />
-              </button>
             </form>
 
             {suggestOpen && debouncedQuery.length > 0 && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-80 border border-border bg-background p-2 shadow-none">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-80 rounded-xl border border-border bg-popover p-2 shadow-lg">
                 {isFetching && suggestions.length === 0 && (
-                  <p className="px-2 py-3 text-xs text-muted-foreground">Searching…</p>
+                  <p className="px-3 py-3 text-xs text-muted-foreground">
+                    Searching organic harvest…
+                  </p>
                 )}
                 {!isFetching && suggestions.length === 0 && (
-                  <p className="px-2 py-3 text-xs text-muted-foreground">
+                  <p className="px-3 py-3 text-xs text-muted-foreground">
                     No products match “{debouncedQuery}”.
                   </p>
                 )}
-                {suggestions.slice(0, 6).map((p) => (
+                {suggestions.slice(0, 5).map((p) => (
                   <Link
                     key={p.id}
                     to="/product/$slug"
                     params={{ slug: p.slug }}
                     onClick={() => setSuggestOpen(false)}
-                    className="flex items-center gap-3 px-2 py-2 transition-colors hover:bg-muted"
+                    className="flex items-center gap-3 rounded-lg px-2.5 py-2 transition-colors hover:bg-muted"
                   >
-                    <span className="h-14 w-11 shrink-0 overflow-hidden bg-muted">
+                    <span className="h-12 w-10 shrink-0 overflow-hidden rounded bg-muted">
                       {p.images[0] && (
                         <img src={p.images[0]} alt="" className="h-full w-full object-cover" />
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm">{p.name}</span>
-                      <span className="block text-xs text-muted-foreground">
+                      <span className="block truncate text-xs font-semibold text-foreground">
+                        {p.name}
+                      </span>
+                      <span className="block text-[11px] font-medium text-primary">
                         {formatBDT(priceOf(p))}
                       </span>
                     </span>
@@ -190,9 +216,9 @@ export function SiteHeader() {
                   <button
                     type="button"
                     onClick={submitSearch}
-                    className="mt-1 w-full border-t border-border px-2 py-2 text-left text-xs text-muted-foreground hover:text-foreground"
+                    className="mt-1 w-full border-t border-border pt-2 text-center text-xs font-medium text-primary hover:underline"
                   >
-                    View all {suggestions.length} results
+                    View all {suggestions.length} results →
                   </button>
                 )}
               </div>

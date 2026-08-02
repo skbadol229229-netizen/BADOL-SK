@@ -5,14 +5,17 @@ import { useSettings } from "@/hooks/use-store";
 export const Route = createFileRoute("/privacy-policy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — Trikon Clothing" },
+      { title: "Privacy Policy — GreenHarvest Organic Food" },
       {
         name: "description",
         content:
-          "How Trikon Clothing collects, uses and protects the personal information you share when ordering.",
+          "How GreenHarvest collects, uses and protects the personal information you share when ordering fresh organic food.",
       },
-      { property: "og:title", content: "Privacy Policy — Trikon Clothing" },
-      { property: "og:description", content: "What we collect, why we collect it, and your choices." },
+      { property: "og:title", content: "Privacy Policy — GreenHarvest Organic Food" },
+      {
+        property: "og:description",
+        content: "What we collect, why we collect it, and your choices.",
+      },
     ],
   }),
   component: PrivacyPage,
@@ -25,25 +28,25 @@ function PrivacyPage() {
       <PageHeading
         eyebrow="Legal"
         title="Privacy policy"
-        description="This page is maintained by Trikon Clothing and explains how we handle the information you give us when you shop."
+        description={`This page explains how ${storeSettings.storeName} handles the information you share when you place an order for fresh produce.`}
       />
 
       <div className="mt-10 max-w-2xl space-y-8 text-sm leading-relaxed text-muted-foreground">
         <section>
           <h2 className="type-h3 text-foreground">What we collect</h2>
           <p className="mt-3">
-            When you place an order we collect your name, mobile number, district, area and delivery
-            address, plus any note you add. If you contact us we keep your email address and the
-            message you send.
+            When you place an order for fresh organic groceries, we collect your name, mobile
+            number, district, area, and delivery address. If you contact customer service, we retain
+            your email address and message history.
           </p>
         </section>
 
         <section>
           <h2 className="type-h3 text-foreground">Why we collect it</h2>
           <p className="mt-3">
-            We use this information only to confirm and deliver your order, handle exchanges, and
-            reply to your questions. We share your name, phone number and address with the courier
-            company that delivers your parcel — nothing more.
+            We use this information strictly to harvest, package, and deliver your order, handle
+            freshness guarantees, and reply to your inquiries. We share delivery details with our
+            refrigerated cold-chain courier partners solely to execute your order.
           </p>
         </section>
 
@@ -58,23 +61,22 @@ function PrivacyPage() {
         <section>
           <h2 className="type-h3 text-foreground">Storage on your device</h2>
           <p className="mt-3">
-            Your shopping bag and your most recent order confirmation are stored in your own
-            browser so you can return to them later. Clearing your browser data removes them.
+            Your shopping cart and recent order receipts are saved locally in your browser so you
+            can access them conveniently. Clearing your browser cache removes this stored data.
           </p>
         </section>
 
         <section>
           <h2 className="type-h3 text-foreground">Your choices</h2>
           <p className="mt-3">
-            You can ask us to correct or delete the details attached to your order at any time by
-            emailing{" "}
+            You can request to modify or purge order contact records at any time by contacting us at{" "}
             <a
               href={`mailto:${storeSettings.supportEmail}`}
-              className="underline underline-offset-4"
+              className="underline underline-offset-4 text-primary font-medium"
             >
               {storeSettings.supportEmail}
             </a>
-            . We will confirm the change within one working day.
+            .
           </p>
         </section>
       </div>

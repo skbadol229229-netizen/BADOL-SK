@@ -7,7 +7,6 @@ import { ProductGrid, ProductGridSkeleton } from "@/components/product-card";
 import { fetchProducts } from "@/data/api";
 import { useDebounced } from "@/hooks/use-debounced";
 
-
 type SearchParams = { q?: string };
 
 export const Route = createFileRoute("/search")({
@@ -82,7 +81,6 @@ function SearchPage() {
         )}
       </form>
 
-
       <div className="mt-10">
         {!active && (
           <EmptyState
@@ -115,7 +113,6 @@ function SearchPage() {
           </>
         )}
       </div>
-
     </Container>
   );
 }

@@ -141,9 +141,7 @@ export function AdminEmpty({
     <div className="grid place-items-center px-4 py-12 text-center">
       <Inbox className="h-8 w-8 text-muted-foreground" />
       <p className="mt-3 text-sm font-medium">{title}</p>
-      {description && (
-        <p className="mt-1 max-w-sm text-xs text-muted-foreground">{description}</p>
-      )}
+      {description && <p className="mt-1 max-w-sm text-xs text-muted-foreground">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

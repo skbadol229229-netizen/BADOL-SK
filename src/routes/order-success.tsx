@@ -10,13 +10,16 @@ import { useSettings } from "@/hooks/use-store";
 export const Route = createFileRoute("/order-success")({
   head: () => ({
     meta: [
-      { title: "Order Confirmed — Trikon Clothing" },
+      { title: "Order Confirmed — PureBengal Organic" },
       {
         name: "description",
-        content: "Your Trikon order is confirmed. We will call you to verify before dispatch.",
+        content: "Your PureBengal order is confirmed. We will call you to verify before dispatch.",
       },
-      { property: "og:title", content: "Order Confirmed — Trikon Clothing" },
-      { property: "og:description", content: "Thank you for shopping with Trikon Clothing." },
+      { property: "og:title", content: "Order Confirmed — PureBengal Organic" },
+      {
+        property: "og:description",
+        content: "Thank you for choosing PureBengal Organic Food Store.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -52,10 +55,7 @@ function OrderSuccessPage() {
           title="No recent order found"
           description="We couldn't find a recent order in this browser session."
           action={
-            <Link
-              to="/shop"
-              className="btn btn-solid"
-            >
+            <Link to="/shop" className="btn btn-solid">
               Shop all products
             </Link>
           }

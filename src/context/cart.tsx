@@ -56,9 +56,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = useCallback((key: string, quantity: number) => {
     setLines((prev) =>
       prev.map((l) =>
-        lineKey(l) === key
-          ? { ...l, quantity: Math.max(1, Math.min(quantity, l.maxQuantity)) }
-          : l,
+        lineKey(l) === key ? { ...l, quantity: Math.max(1, Math.min(quantity, l.maxQuantity)) } : l,
       ),
     );
   }, []);

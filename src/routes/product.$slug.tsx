@@ -22,13 +22,13 @@ export const Route = createFileRoute("/product/$slug")({
     if (!loaderData) {
       return {
         meta: [
-          { title: "Product not found — Trikon Clothing" },
+          { title: "Product not found — PureBengal Organic" },
           { name: "robots", content: "noindex" },
         ],
       };
     }
     const { product } = loaderData;
-    const title = `${product.name} — Trikon Clothing`;
+    const title = `${product.name} — PureBengal Organic Food`;
     return {
       meta: [
         { title },
@@ -49,10 +49,7 @@ function ProductNotFound() {
       <p className="mt-3 text-sm text-muted-foreground">
         This product is no longer available or the link is incorrect.
       </p>
-      <Link
-        to="/shop"
-        className="mt-8 btn btn-solid"
-      >
+      <Link to="/shop" className="mt-8 btn btn-solid">
         Shop all products
       </Link>
     </Container>
@@ -65,7 +62,7 @@ function ProductPage() {
   const storeSettings = useSettings();
 
   const [activeImage, setActiveImage] = useState(0);
-  const [size, setSize] = useState<string | null>(null);
+  const [size, setSize] = useState<string | null>(product.sizes[0] ?? null);
   const [color, setColor] = useState<string | null>(product.colors[0]?.name ?? null);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -120,7 +117,11 @@ function ProductPage() {
           Home
         </Link>
         <span className="px-2">/</span>
-        <Link to="/category/$slug" params={{ slug: product.categorySlug }} className="hover:underline">
+        <Link
+          to="/category/$slug"
+          params={{ slug: product.categorySlug }}
+          className="hover:underline"
+        >
           {product.categorySlug.replace("-", " ")}
         </Link>
       </nav>
@@ -146,13 +147,7 @@ function ProductPage() {
                   aria-label={`View image ${i + 1}`}
                   className={`w-14 shrink-0 border md:w-16 ${i === activeImage ? "border-foreground" : "border-border"}`}
                 >
-                  <AppImage
-                    src={img}
-                    alt=""
-                    width={800}
-                    height={1000}
-                    className="media-4x5"
-                  />
+                  <AppImage src={img} alt="" width={800} height={1000} className="media-4x5" />
                 </button>
               ))}
             </div>
@@ -268,10 +263,7 @@ function ProductPage() {
           >
             {soldOut ? "Out of stock" : adding ? "Adding…" : "Add to cart"}
           </button>
-          <Link
-            to="/cart"
-            className="mt-3 btn btn-outline btn-block"
-          >
+          <Link to="/cart" className="mt-3 btn btn-outline btn-block">
             View cart
           </Link>
 
@@ -279,8 +271,9 @@ function ProductPage() {
             <div className="flex gap-3">
               <Truck className="mt-0.5 h-4 w-4 shrink-0" />
               <span className="text-muted-foreground">
-                Delivery {storeSettings.deliveryTimeInside} inside Dhaka ({formatBDT(storeSettings.deliveryInsideDhaka)}),{" "}
-                {storeSettings.deliveryTimeOutside} outside ({formatBDT(storeSettings.deliveryOutsideDhaka)}).
+                Delivery {storeSettings.deliveryTimeInside} inside Dhaka (
+                {formatBDT(storeSettings.deliveryInsideDhaka)}), {storeSettings.deliveryTimeOutside}{" "}
+                outside ({formatBDT(storeSettings.deliveryOutsideDhaka)}).
               </span>
             </div>
             <div className="flex gap-3">

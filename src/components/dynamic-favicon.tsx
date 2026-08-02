@@ -10,7 +10,6 @@ function faviconUrl(logoUrl: string): string {
   return `${logoUrl.slice(0, i + marker.length)}w_64,h_64,c_fill,g_auto,r_max,f_png/${logoUrl.slice(
     i + marker.length,
   )}`;
-
 }
 
 /**

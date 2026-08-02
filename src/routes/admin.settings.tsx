@@ -82,14 +82,11 @@ function AdminSettingsPage() {
               <ImageUploader
                 value={{ url: form.logoUrl, publicId: form.logoPublicId }}
                 onChange={(next) =>
-                  setForm((f) =>
-                    f ? { ...f, logoUrl: next.url, logoPublicId: next.publicId } : f,
-                  )
+                  setForm((f) => (f ? { ...f, logoUrl: next.url, logoPublicId: next.publicId } : f))
                 }
                 aspect="aspect-square"
                 previewClassName="max-w-[140px] rounded-full"
                 assistiveText="Square image works best — it is shown as a circle across the site"
-
               />
             </Field>
           </div>

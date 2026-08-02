@@ -14,14 +14,17 @@ import { saveOrder } from "@/lib/order-storage";
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Checkout — Cash on Delivery | Trikon Clothing" },
+      { title: "Checkout — Cash on Delivery | PureBengal Organic" },
       {
         name: "description",
         content:
-          "Complete your Trikon order with cash on delivery. Delivery ৳70 inside Dhaka and ৳120 outside Dhaka.",
+          "Complete your organic harvest order with cash on delivery. Express delivery inside Dhaka and refrigerated shipping nationwide.",
       },
-      { property: "og:title", content: "Checkout — Cash on Delivery | Trikon Clothing" },
-      { property: "og:description", content: "Pay when your parcel arrives, anywhere in Bangladesh." },
+      { property: "og:title", content: "Checkout — Cash on Delivery | PureBengal Organic" },
+      {
+        property: "og:description",
+        content: "Pay when your fresh organic parcel arrives, anywhere in Bangladesh.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,7 +40,9 @@ const checkoutSchema = z.object({
   mobile: z
     .string()
     .trim()
-    .regex(/^01[3-9]\d{8}$/, { message: "Enter a valid 11 digit mobile number, e.g. 01712345678." }),
+    .regex(/^01[3-9]\d{8}$/, {
+      message: "Enter a valid 11 digit mobile number, e.g. 01712345678.",
+    }),
   district: z.string().min(1, { message: "Please select your district." }),
   area: z
     .string()
@@ -154,9 +159,7 @@ function CheckoutPage() {
     }
   }
 
-
-  const inputClass = (invalid?: string) =>
-    `field-input ${invalid ? "field-invalid" : ""}`;
+  const inputClass = (invalid?: string) => `field-input ${invalid ? "field-invalid" : ""}`;
 
   if (hydrated && lines.length === 0) {
     return (
@@ -167,10 +170,7 @@ function CheckoutPage() {
             title="Your bag is empty"
             description="Add products to your bag before placing an order."
             action={
-              <Link
-                to="/shop"
-                className="btn btn-solid"
-              >
+              <Link to="/shop" className="btn btn-solid">
                 Shop all products
               </Link>
             }
@@ -246,9 +246,7 @@ function CheckoutPage() {
                   </option>
                 ))}
               </select>
-              {errors.district && (
-                <p className="field-error">{errors.district}</p>
-              )}
+              {errors.district && <p className="field-error">{errors.district}</p>}
             </div>
             <div>
               <label htmlFor="area" className="field-label">
@@ -334,7 +332,9 @@ function CheckoutPage() {
                     {l.size} · {l.color} · ×{l.quantity}
                   </p>
                 </div>
-                <span className="shrink-0 whitespace-nowrap text-sm">{formatBDT(l.unitPrice * l.quantity)}</span>
+                <span className="shrink-0 whitespace-nowrap text-sm">
+                  {formatBDT(l.unitPrice * l.quantity)}
+                </span>
               </li>
             ))}
           </ul>
@@ -345,7 +345,12 @@ function CheckoutPage() {
             </div>
             <div className="flex justify-between">
               <dt className="text-muted-foreground">
-                Delivery {values.district === "Dhaka" ? "(inside Dhaka)" : values.district ? "(outside Dhaka)" : ""}
+                Delivery{" "}
+                {values.district === "Dhaka"
+                  ? "(inside Dhaka)"
+                  : values.district
+                    ? "(outside Dhaka)"
+                    : ""}
               </dt>
               <dd>{formatBDT(deliveryCharge)}</dd>
             </div>

@@ -1,23 +1,6 @@
-import {
-  execBatch,
-  execSql,
-  isTursoConfigured,
-  queryRow,
-  queryRows,
-} from "@/lib/turso";
-import {
-  defaultBanner,
-  defaultCategories,
-  defaultProducts,
-  defaultSettings,
-} from "@/data/catalog";
-import {
-  mapBanner,
-  mapCategory,
-  mapProduct,
-  mapReview,
-  mapSettings,
-} from "@/data/api";
+import { execBatch, execSql, isTursoConfigured, queryRow, queryRows } from "@/lib/turso";
+import { defaultBanner, defaultCategories, defaultProducts, defaultSettings } from "@/data/catalog";
+import { mapBanner, mapCategory, mapProduct, mapReview, mapSettings } from "@/data/api";
 import type {
   Banner,
   Category,
@@ -41,7 +24,7 @@ export async function signInAdmin(email: string, password: string): Promise<void
     try {
       const user = await queryRow<{ id: string; role: string; password_hash: string }>(
         "SELECT * FROM admin_users WHERE LOWER(email) = ?",
-        [cleanEmail]
+        [cleanEmail],
       );
       if (user) {
         if (user.password_hash !== password) {
@@ -52,7 +35,7 @@ export async function signInAdmin(email: string, password: string): Promise<void
         const id = "admin_" + Date.now().toString(36);
         await execSql(
           "INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, 'admin')",
-          [id, cleanEmail, password]
+          [id, cleanEmail, password],
         );
       }
     } catch (e) {
@@ -65,7 +48,7 @@ export async function signInAdmin(email: string, password: string): Promise<void
   try {
     window.localStorage.setItem(
       ADMIN_SESSION_KEY,
-      JSON.stringify({ email: cleanEmail, time: Date.now() })
+      JSON.stringify({ email: cleanEmail, time: Date.now() }),
     );
   } catch {
     /* storage unavailable */
@@ -94,11 +77,11 @@ export async function signOutAdmin(): Promise<void> {
 export async function getAdminEmail(): Promise<string> {
   try {
     const raw = window.localStorage.getItem(ADMIN_SESSION_KEY);
-    if (!raw) return "admin@dhakathreads.com";
+    if (!raw) return "admin@organicbd.com";
     const session = JSON.parse(raw) as { email: string };
-    return session.email || "admin@dhakathreads.com";
+    return session.email || "admin@organicbd.com";
   } catch {
-    return "admin@dhakathreads.com";
+    return "admin@organicbd.com";
   }
 }
 
@@ -136,12 +119,7 @@ export async function fetchAdminStats(): Promise<AdminStats> {
   }
 
   try {
-    const [
-      orders,
-      products,
-      categories,
-      reviews,
-    ] = await Promise.all([
+    const [orders, products, categories, reviews] = await Promise.all([
       queryRows<{ status: string; total: number }>("SELECT status, total FROM orders"),
       queryRows<{ active: number; stock: number }>("SELECT active, stock FROM products"),
       queryRows<{ id: string }>("SELECT id FROM categories"),
@@ -217,7 +195,7 @@ export async function fetchLowStock(threshold = 5): Promise<LowStockRow[]> {
   try {
     const rows = await queryRows<Record<string, unknown>>(
       "SELECT id, name, slug, sku, stock, active FROM products WHERE stock <= ? ORDER BY stock ASC",
-      [threshold]
+      [threshold],
     );
     return rows.map((r) => ({
       id: String(r.id),
@@ -283,7 +261,7 @@ export async function adminCreateProduct(input: ProductInput): Promise<void> {
       input.newArrival ? 1 : 0,
       input.active ? 1 : 0,
       input.sortOrder,
-    ]
+    ],
   );
 }
 
@@ -314,7 +292,7 @@ export async function adminUpdateProduct(id: string, input: ProductInput): Promi
       input.active ? 1 : 0,
       input.sortOrder,
       id,
-    ]
+    ],
   );
 }
 
@@ -353,7 +331,7 @@ export async function adminCreateCategory(input: CategoryInput): Promise<void> {
       input.imagePublicId || "",
       input.active ? 1 : 0,
       input.sortOrder,
-    ]
+    ],
   );
 }
 
@@ -369,7 +347,7 @@ export async function adminUpdateCategory(id: string, input: CategoryInput): Pro
       input.active ? 1 : 0,
       input.sortOrder,
       id,
-    ]
+    ],
   );
 }
 
@@ -407,7 +385,7 @@ export async function adminCreateBanner(input: BannerInput): Promise<void> {
       input.mobileImagePublicId || "",
       input.active ? 1 : 0,
       input.sortOrder,
-    ]
+    ],
   );
 }
 
@@ -426,7 +404,7 @@ export async function adminUpdateBanner(id: string, input: BannerInput): Promise
       input.active ? 1 : 0,
       input.sortOrder,
       id,
-    ]
+    ],
   );
 }
 
@@ -459,7 +437,7 @@ export async function adminCreateReview(input: ReviewInput): Promise<void> {
       input.body,
       input.approved ? 1 : 0,
       input.date || new Date().toISOString().slice(0, 10),
-    ]
+    ],
   );
 }
 
@@ -474,7 +452,7 @@ export async function adminUpdateReview(id: string, input: ReviewInput): Promise
       input.approved ? 1 : 0,
       input.date || new Date().toISOString().slice(0, 10),
       id,
-    ]
+    ],
   );
 }
 
@@ -490,7 +468,7 @@ async function fetchOrderItems(orderIds: string[]): Promise<Record<string, Order
     const placeholders = orderIds.map(() => "?").join(",");
     const rows = await queryRows<Record<string, unknown>>(
       `SELECT * FROM order_items WHERE order_id IN (${placeholders})`,
-      orderIds
+      orderIds,
     );
     const map: Record<string, OrderItem[]> = {};
     for (const r of rows) {
@@ -536,7 +514,9 @@ function mapOrderRow(row: Record<string, unknown>, items: OrderItem[] = []): Ord
 
 export async function adminListOrders(): Promise<Order[]> {
   try {
-    const rows = await queryRows<Record<string, unknown>>("SELECT * FROM orders ORDER BY created_at DESC");
+    const rows = await queryRows<Record<string, unknown>>(
+      "SELECT * FROM orders ORDER BY created_at DESC",
+    );
     const ids = rows.map((r) => String(r.id));
     const itemsMap = await fetchOrderItems(ids);
     return rows.map((r) => mapOrderRow(r, itemsMap[String(r.id)] || []));
@@ -605,7 +585,7 @@ export async function adminUpdateSettings(input: StoreSettings): Promise<void> {
       input.deliveryTimeOutside,
       input.exchangeWindowDays,
       input.codEnabled ? 1 : 0,
-    ]
+    ],
   );
 }
 
@@ -615,7 +595,7 @@ export async function fetchRecentOrders(limit = 8): Promise<Order[]> {
   try {
     const rows = await queryRows<Record<string, unknown>>(
       "SELECT * FROM orders ORDER BY created_at DESC LIMIT ?",
-      [limit]
+      [limit],
     );
     const ids = rows.map((r) => String(r.id));
     const itemsMap = await fetchOrderItems(ids);
@@ -648,7 +628,7 @@ export async function fetchSalesSeries(days = 30): Promise<SalesPoint[]> {
   try {
     const rows = await queryRows<{ created_at: string; total: number; status: string }>(
       "SELECT created_at, total, status FROM orders WHERE created_at >= ? ORDER BY created_at ASC",
-      [start.toISOString()]
+      [start.toISOString()],
     );
 
     for (const row of rows) {

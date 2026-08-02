@@ -100,7 +100,6 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
     if (inputRef.current) inputRef.current.value = "";
   }
 
-
   return (
     <div>
       <input
@@ -226,7 +225,6 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
       {savings && !busy && (
         <p className="mt-2 text-xs text-muted-foreground">Uploaded — {savings}</p>
       )}
-
 
       {errors.length > 0 && (
         <ul className="mt-2 space-y-1">

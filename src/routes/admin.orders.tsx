@@ -82,7 +82,12 @@ function AdminOrdersPage() {
     <AdminShell title="Orders" description="Every cash-on-delivery order placed on the store.">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Total orders" value={String(all.length)} loading={orders.isPending} />
-        <StatCard label="Pending" value={String(pending)} tone="warning" loading={orders.isPending} />
+        <StatCard
+          label="Pending"
+          value={String(pending)}
+          tone="warning"
+          loading={orders.isPending}
+        />
         <StatCard
           label="Delivered"
           value={String(delivered.length)}

@@ -14,9 +14,7 @@ export function PageHeading({
     <div className="max-w-2xl">
       {eyebrow && <p className="label-caps text-muted-foreground">{eyebrow}</p>}
       <h1 className="type-h1 mt-3">{title}</h1>
-      {description && (
-        <p className="type-body mt-4 text-muted-foreground">{description}</p>
-      )}
+      {description && <p className="type-body mt-4 text-muted-foreground">{description}</p>}
     </div>
   );
 }
@@ -77,6 +75,12 @@ export function ErrorState({ onRetry, message }: { onRetry?: () => void; message
   );
 }
 
-export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Container({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return <div className={`mx-auto w-full max-w-7xl px-4 md:px-8 ${className}`}>{children}</div>;
 }

@@ -6,16 +6,16 @@ import { formatBDT } from "@/lib/format";
 export const Route = createFileRoute("/delivery-and-exchange")({
   head: () => ({
     meta: [
-      { title: "Delivery & Exchange — Trikon Clothing" },
+      { title: "Delivery & Returns — GreenHarvest Organic Food" },
       {
         name: "description",
         content:
-          "Delivery ৳70 inside Dhaka and ৳120 outside Dhaka, cash on delivery nationwide, plus a 7 day exchange window.",
+          "Same-day organic produce delivery ৳60 inside Dhaka and ৳120 outside Dhaka, cash on delivery, with fresh quality guarantee.",
       },
-      { property: "og:title", content: "Delivery & Exchange — Trikon Clothing" },
+      { property: "og:title", content: "Delivery & Returns — GreenHarvest Organic Food" },
       {
         property: "og:description",
-        content: "Charges, timelines and how to request an exchange with Trikon.",
+        content: "Cold-chain delivery charges, schedules, and freshness guarantee policy.",
       },
     ],
   }),
@@ -27,59 +27,56 @@ function DeliveryPage() {
   return (
     <Container className="py-10 md:py-16">
       <PageHeading
-        eyebrow="Policy"
-        title="Delivery & exchange"
-        description="We ship to all 64 districts of Bangladesh with cash on delivery as the default payment method."
+        eyebrow="Delivery & Policy"
+        title="Delivery & Freshness Guarantee"
+        description="We deliver farm-fresh organic vegetables, fruits, dairy, and pantry items in temperature-maintained eco packaging."
       />
 
       <div className="mt-10 max-w-2xl space-y-10">
         <section>
-          <h2 className="type-h2">Delivery charges</h2>
-          <div className="mt-4 border border-border">
+          <h2 className="type-h2">Delivery Rates & Speed</h2>
+          <div className="mt-4 border border-border rounded-md overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm">
-              <span>Inside Dhaka city · {storeSettings.deliveryTimeInside}</span>
-              <span className="font-medium">{formatBDT(storeSettings.deliveryInsideDhaka)}</span>
+              <span>Inside Dhaka City · {storeSettings.deliveryTimeInside}</span>
+              <span className="font-semibold text-primary">
+                {formatBDT(storeSettings.deliveryInsideDhaka)}
+              </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3 text-sm">
               <span>Outside Dhaka · {storeSettings.deliveryTimeOutside}</span>
-              <span className="font-medium">{formatBDT(storeSettings.deliveryOutsideDhaka)}</span>
+              <span className="font-semibold text-primary">
+                {formatBDT(storeSettings.deliveryOutsideDhaka)}
+              </span>
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="type-h2">How orders are processed</h2>
+          <h2 className="type-h2">How Orders Are Fulfilled</h2>
           <ol className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
-            <li>1. You place the order with cash on delivery selected.</li>
-            <li>2. Our team calls your mobile number to confirm size, colour and address.</li>
-            <li>3. The parcel is packed, checked and handed to the courier the same or next day.</li>
-            <li>4. You pay the courier in cash when the parcel reaches you.</li>
+            <li>1. Place your order online with Cash on Delivery or online payment.</li>
+            <li>2. Early morning harvest is collected from organic farms and quality tested.</li>
+            <li>3. Packed in breathable, temperature-regulated bio-bags.</li>
+            <li>4. Delivered directly to your door with real-time mobile tracking updates.</li>
           </ol>
         </section>
 
         <section>
-          <h2 className="type-h2">Exchange</h2>
+          <h2 className="type-h2">Freshness Guarantee & Returns</h2>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            You can exchange any item within {storeSettings.exchangeWindowDays} days of delivery if
-            it is unworn, unwashed and has its tags attached. Size exchanges are free of product
-            cost — you only pay the return courier charge. Boxers and innerwear cannot be exchanged
-            for hygiene reasons once the pack is opened.
+            If any perishable fruit or vegetable arrives damaged, bruised, or not up to your fresh
+            quality standards, inform us within {storeSettings.exchangeWindowDays} days. We will
+            immediately send a fresh replacement or refund your item with no hassle.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            To start an exchange, call{" "}
-            <a href={`tel:${storeSettings.supportPhone}`} className="underline underline-offset-4">
+            For support or instant replacements, call or WhatsApp{" "}
+            <a
+              href={`tel:${storeSettings.supportPhone}`}
+              className="underline font-medium text-primary"
+            >
               {storeSettings.supportPhone}
-            </a>{" "}
-            with your order number ready.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="type-h2">Damaged or wrong item</h2>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            If we sent the wrong product or the item arrived with a manufacturing fault, contact us
-            within 48 hours of delivery. We collect the parcel at our own cost and send a
-            replacement, or refund the full amount including delivery.
+            </a>
+            .
           </p>
         </section>
       </div>
