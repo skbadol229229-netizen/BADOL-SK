@@ -1,0 +1,879 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Trikon Clothing design system.
+ * Editorial, premium, warm-neutral. All colors are oklch semantic tokens.
+ * Never hardcode colors in components.
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 6px);
+  --radius-3xl: calc(var(--radius) + 8px);
+  --radius-4xl: calc(var(--radius) + 10px);
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sand: var(--sand);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.125rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.184 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.184 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.184 0 0);
+  --primary: oklch(0.184 0 0);
+  --primary-foreground: oklch(0.99 0.002 85);
+  --secondary: oklch(0.968 0.005 85);
+  --secondary-foreground: oklch(0.184 0 0);
+  --muted: oklch(0.968 0.005 85);
+  --muted-foreground: oklch(0.53 0.004 85);
+  --accent: oklch(0.949 0.009 82);
+  --accent-foreground: oklch(0.184 0 0);
+  --sand: oklch(0.7 0.048 76);
+  --sand-foreground: oklch(0.184 0 0);
+  --destructive: oklch(0.52 0.19 27);
+  --destructive-foreground: oklch(0.99 0.002 85);
+  --success: oklch(0.52 0.11 155);
+  --success-foreground: oklch(0.99 0.002 85);
+  --border: oklch(0.914 0.008 85);
+  --input: oklch(0.914 0.008 85);
+  --ring: oklch(0.7 0.048 76);
+  --sidebar: oklch(0.968 0.005 85);
+  --sidebar-foreground: oklch(0.184 0 0);
+  --sidebar-primary: oklch(0.184 0 0);
+  --sidebar-primary-foreground: oklch(0.99 0.002 85);
+  --sidebar-accent: oklch(0.949 0.009 82);
+  --sidebar-accent-foreground: oklch(0.184 0 0);
+  --sidebar-border: oklch(0.914 0.008 85);
+  --sidebar-ring: oklch(0.7 0.048 76);
+}
+
+.dark {
+  --background: oklch(0.16 0 0);
+  --foreground: oklch(0.97 0.003 85);
+  --card: oklch(0.2 0 0);
+  --card-foreground: oklch(0.97 0.003 85);
+  --popover: oklch(0.2 0 0);
+  --popover-foreground: oklch(0.97 0.003 85);
+  --primary: oklch(0.97 0.003 85);
+  --primary-foreground: oklch(0.184 0 0);
+  --secondary: oklch(0.24 0.004 85);
+  --secondary-foreground: oklch(0.97 0.003 85);
+  --muted: oklch(0.24 0.004 85);
+  --muted-foreground: oklch(0.72 0.006 85);
+  --accent: oklch(0.28 0.008 82);
+  --accent-foreground: oklch(0.97 0.003 85);
+  --sand: oklch(0.72 0.05 76);
+  --sand-foreground: oklch(0.16 0 0);
+  --destructive: oklch(0.62 0.19 27);
+  --destructive-foreground: oklch(0.99 0.002 85);
+  --success: oklch(0.62 0.11 155);
+  --success-foreground: oklch(0.16 0 0);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.72 0.05 76);
+  --sidebar: oklch(0.2 0 0);
+  --sidebar-foreground: oklch(0.97 0.003 85);
+  --sidebar-primary: oklch(0.97 0.003 85);
+  --sidebar-primary-foreground: oklch(0.184 0 0);
+  --sidebar-accent: oklch(0.28 0.008 82);
+  --sidebar-accent-foreground: oklch(0.97 0.003 85);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.72 0.05 76);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    border-radius: var(--radius);
+  }
+
+  select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position:
+      calc(100% - 17px) calc(50% + 1px),
+      calc(100% - 12px) calc(50% + 1px);
+    background-size: 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2rem;
+  }
+}
+
+@utility font-serif-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+
+@utility label-caps {
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ---- Typography scale (locked) ---- */
+
+@utility type-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 8.2vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+@utility type-h1 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.75rem, 5.6vw, 2.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+
+@utility type-h2 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.375rem, 3.4vw, 1.875rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+@utility type-h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(1.125rem, 2.4vw, 1.375rem);
+  line-height: 1.2;
+}
+
+@utility type-body {
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+@utility type-small {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* ---- Buttons (two heights, three variants) ---- */
+
+@utility btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  padding-inline: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius);
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+  white-space: nowrap;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+}
+
+@utility btn-sm {
+  height: 2.75rem;
+  padding-inline: 1.125rem;
+  font-size: 0.8125rem;
+}
+
+@utility btn-solid {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+
+  &:hover:not(:disabled) {
+    opacity: 0.88;
+  }
+}
+
+@utility btn-outline {
+  border: 1px solid var(--color-foreground);
+  color: var(--color-foreground);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+@utility btn-quiet {
+  height: 2.75rem;
+  padding-inline: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-underline-offset: 4px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+@utility btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* ---- Form fields ---- */
+
+@utility field-label {
+  display: block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  margin-bottom: 0.5rem;
+}
+
+@utility field-input {
+  display: block;
+  width: 100%;
+  height: 3rem;
+  padding-inline: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  outline: none;
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  &:focus {
+    border-color: var(--color-foreground);
+  }
+}
+
+@utility field-textarea {
+  display: block;
+  width: 100%;
+  min-height: 6rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  outline: none;
+  resize: vertical;
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+
+  &:focus {
+    border-color: var(--color-foreground);
+  }
+}
+
+@utility field-invalid {
+  border-color: var(--color-destructive);
+}
+
+@utility field-error {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-destructive);
+}
+
+/* ---- Chips / selectable options (44px tap target) ---- */
+
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding-inline: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-foreground);
+  }
+}
+
+@utility chip-active {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+@utility chip-disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ---- Media + text helpers ---- */
+
+@utility media-4x5 {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  object-fit: cover;
+  background-color: var(--color-secondary);
+}
+
+@utility clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---- Section rhythm ---- */
+
+@utility section-y {
+  padding-block: 3rem;
+
+  @media (width >= 768px) {
+    padding-block: 5rem;
+  }
+}
+
+@utility grid-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 0.75rem;
+  row-gap: 1.75rem;
+
+  @media (width >= 768px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 1.25rem;
+    row-gap: 2.5rem;
+  }
+
+  @media (width >= 1024px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================================================
+ * Admin panel theme (scoped — never affects the public storefront)
+ * ========================================================================= */
+
+.admin-theme {
+  /* Warm cream surfaces — no pure white anywhere. */
+  --background: oklch(0.955 0.012 88);
+  --foreground: oklch(0.18 0.004 80);
+  --card: oklch(0.984 0.008 90);
+  --card-foreground: oklch(0.18 0.004 80);
+  --popover: oklch(0.984 0.008 90);
+  --popover-foreground: oklch(0.18 0.004 80);
+  --primary: oklch(0.19 0.006 80);
+  --primary-foreground: oklch(0.984 0.008 90);
+  --secondary: oklch(0.935 0.014 88);
+  --secondary-foreground: oklch(0.18 0.004 80);
+  --muted: oklch(0.935 0.014 88);
+  --muted-foreground: oklch(0.5 0.012 80);
+  --accent: oklch(0.925 0.02 84);
+  --accent-foreground: oklch(0.18 0.004 80);
+  --sand: oklch(0.67 0.06 75);
+  --sand-foreground: oklch(0.99 0.006 90);
+  --border: oklch(0.882 0.016 86);
+  --input: oklch(0.882 0.016 86);
+  --ring: oklch(0.67 0.06 75);
+  --destructive: oklch(0.58 0.21 27);
+  --destructive-foreground: oklch(0.99 0.006 90);
+  --success: oklch(0.52 0.13 150);
+  --success-foreground: oklch(0.99 0.006 90);
+
+  --admin-accent: oklch(0.67 0.06 75);
+  --admin-warning: oklch(0.65 0.15 62);
+  --admin-info: oklch(0.55 0.21 262);
+  --admin-purple: oklch(0.53 0.25 293);
+  --admin-indigo: oklch(0.51 0.23 277);
+  --admin-grey: oklch(0.55 0.02 260);
+
+  /* Re-map Tailwind color tokens locally (@theme inline resolves at :root). */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sand: var(--sand);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --admin-tint: oklch(0.984 0.008 90);
+  --admin-tint-ink: oklch(0.2 0.01 80);
+  --admin-shadow: 0 1px 2px oklch(0.28 0.03 80 / 7%), 0 1px 3px oklch(0.28 0.03 80 / 5%);
+  --admin-shadow-md: 0 2px 6px oklch(0.28 0.03 80 / 8%), 0 8px 24px oklch(0.28 0.03 80 / 6%);
+
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}
+
+/* Dark mode admin — warm charcoal, keeps the same hierarchy. */
+.dark .admin-theme,
+.admin-theme.dark {
+  --background: oklch(0.168 0.004 80);
+  --foreground: oklch(0.955 0.01 88);
+  --card: oklch(0.212 0.005 80);
+  --card-foreground: oklch(0.955 0.01 88);
+  --popover: oklch(0.212 0.005 80);
+  --popover-foreground: oklch(0.955 0.01 88);
+  --primary: oklch(0.93 0.014 86);
+  --primary-foreground: oklch(0.18 0.004 80);
+  --secondary: oklch(0.255 0.006 80);
+  --secondary-foreground: oklch(0.955 0.01 88);
+  --muted: oklch(0.255 0.006 80);
+  --muted-foreground: oklch(0.72 0.01 84);
+  --accent: oklch(0.3 0.012 82);
+  --accent-foreground: oklch(0.955 0.01 88);
+  --sand: oklch(0.74 0.06 76);
+  --sand-foreground: oklch(0.18 0.004 80);
+  --border: oklch(0.32 0.008 82);
+  --input: oklch(0.32 0.008 82);
+  --ring: oklch(0.74 0.06 76);
+  --destructive: oklch(0.63 0.19 27);
+  --destructive-foreground: oklch(0.98 0.006 90);
+  --success: oklch(0.64 0.13 152);
+  --success-foreground: oklch(0.16 0.004 80);
+
+  --admin-accent: oklch(0.76 0.07 76);
+  --admin-warning: oklch(0.76 0.14 62);
+  --admin-info: oklch(0.7 0.15 258);
+  --admin-purple: oklch(0.7 0.16 293);
+  --admin-indigo: oklch(0.68 0.15 275);
+  --admin-grey: oklch(0.7 0.02 260);
+
+  /* Re-map Tailwind color tokens locally (@theme inline resolves at :root). */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-sand: var(--sand);
+  --color-sand-foreground: var(--sand-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --admin-tint: oklch(0.212 0.005 80);
+  --admin-tint-ink: oklch(0.95 0.01 88);
+  --admin-shadow: 0 1px 2px oklch(0 0 0 / 40%), 0 1px 3px oklch(0 0 0 / 30%);
+  --admin-shadow-md: 0 2px 6px oklch(0 0 0 / 45%), 0 8px 24px oklch(0 0 0 / 35%);
+}
+
+.admin-theme h1,
+.admin-theme h2,
+.admin-theme h3,
+.admin-theme h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.admin-theme .font-serif-display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+}
+
+/* --- surfaces --- */
+
+.a-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  box-shadow: var(--admin-shadow);
+}
+
+.a-card-pad {
+  padding: 1rem;
+}
+
+@media (width >= 768px) {
+  .a-card-pad {
+    padding: 1.25rem;
+  }
+}
+
+.a-section-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.a-muted {
+  color: var(--color-muted-foreground);
+}
+
+/* --- buttons --- */
+
+.a-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding-inline: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: 0.375rem;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.a-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.a-btn-lg {
+  height: 2.75rem;
+  padding-inline: 1.125rem;
+  font-size: 0.875rem;
+}
+
+.a-btn-icon {
+  width: 2.5rem;
+  padding-inline: 0;
+}
+
+.a-btn-primary {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.a-btn-primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.a-btn-accent {
+  background-color: var(--admin-accent);
+  color: oklch(1 0 0);
+}
+
+.a-btn-accent:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.a-btn-outline {
+  border-color: var(--color-border);
+  background-color: var(--color-card);
+  color: var(--color-foreground);
+}
+
+.a-btn-outline:hover:not(:disabled) {
+  background-color: var(--color-secondary);
+  border-color: var(--admin-accent);
+}
+
+.a-btn-ghost {
+  color: var(--color-muted-foreground);
+  background-color: transparent;
+}
+
+.a-btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-secondary);
+  color: var(--color-foreground);
+}
+
+.a-btn-danger {
+  border-color: var(--color-border);
+  background-color: var(--color-card);
+  color: var(--color-destructive);
+}
+
+.a-btn-danger:hover:not(:disabled) {
+  background-color: var(--color-destructive);
+  border-color: var(--color-destructive);
+  color: oklch(1 0 0);
+}
+
+/* --- form fields --- */
+
+.a-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+  margin-bottom: 0.375rem;
+}
+
+.a-hint {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--color-muted-foreground);
+}
+
+.a-input {
+  display: block;
+  width: 100%;
+  height: 2.75rem;
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-foreground);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.a-input::placeholder {
+  color: var(--color-muted-foreground);
+}
+
+.a-input:focus {
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--admin-accent) 18%, transparent);
+}
+
+textarea.a-input {
+  height: auto;
+  min-height: 6rem;
+  padding-block: 0.625rem;
+  resize: vertical;
+}
+
+/* --- badges --- */
+
+.a-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.a-badge-neutral {
+  background-color: var(--color-secondary);
+  color: var(--color-muted-foreground);
+  border-color: var(--color-border);
+}
+
+.a-badge-accent {
+  background-color: color-mix(in oklab, var(--admin-accent) 14%, var(--admin-tint));
+  color: color-mix(in oklab, var(--admin-accent) 80%, var(--admin-tint-ink));
+  border-color: color-mix(in oklab, var(--admin-accent) 32%, var(--admin-tint));
+}
+
+.a-badge-success {
+  background-color: color-mix(in oklab, var(--color-success) 12%, var(--admin-tint));
+  color: var(--color-success);
+  border-color: color-mix(in oklab, var(--color-success) 28%, var(--admin-tint));
+}
+
+.a-badge-warning {
+  background-color: color-mix(in oklab, var(--admin-warning) 14%, var(--admin-tint));
+  color: var(--admin-warning);
+  border-color: color-mix(in oklab, var(--admin-warning) 30%, var(--admin-tint));
+}
+
+.a-badge-danger {
+  background-color: color-mix(in oklab, var(--color-destructive) 10%, var(--admin-tint));
+  color: var(--color-destructive);
+  border-color: color-mix(in oklab, var(--color-destructive) 26%, var(--admin-tint));
+}
+
+.a-badge-info {
+  background-color: color-mix(in oklab, var(--admin-info) 10%, var(--admin-tint));
+  color: var(--admin-info);
+  border-color: color-mix(in oklab, var(--admin-info) 26%, var(--admin-tint));
+}
+
+.a-badge-purple {
+  background-color: color-mix(in oklab, var(--admin-purple) 10%, var(--admin-tint));
+  color: var(--admin-purple);
+  border-color: color-mix(in oklab, var(--admin-purple) 26%, var(--admin-tint));
+}
+
+.a-badge-indigo {
+  background-color: color-mix(in oklab, var(--admin-indigo) 10%, var(--admin-tint));
+  color: var(--admin-indigo);
+  border-color: color-mix(in oklab, var(--admin-indigo) 26%, var(--admin-tint));
+}
+
+/* --- tables --- */
+
+.a-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.8125rem;
+}
+
+.a-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--color-secondary);
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.a-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.a-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.a-table tbody tr:hover {
+  background-color: color-mix(in oklab, var(--color-secondary) 70%, var(--admin-tint));
+}
+
+/* --- misc --- */
+
+.a-skeleton {
+  background-color: color-mix(in oklab, var(--color-border) 60%, var(--admin-tint));
+  border-radius: 0.375rem;
+  animation: a-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes a-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.a-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
