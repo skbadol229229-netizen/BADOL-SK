@@ -38,7 +38,6 @@ export function mapProduct(row: Row): Product {
   const images = parseJson<string[]>(row.images, []);
   const imagePublicIds = parseJson<string[]>(row.image_public_ids, []);
   const sizes = parseJson<string[]>(row.sizes, []);
-  const colors = parseJson<ProductColor[]>(row.colors, []);
 
   return {
     id: String(row.id),
@@ -52,7 +51,7 @@ export function mapProduct(row: Row): Product {
     regularPrice: Number(row.regular_price ?? 0),
     salePrice: row.sale_price == null ? null : Number(row.sale_price),
     sizes,
-    colors: colors.filter((c) => c && c.name),
+    colors: [],
     stock: Number(row.stock ?? 0),
     sku: (row.sku as string) ?? "",
     featured: Boolean(row.featured),
@@ -119,12 +118,16 @@ export function mapSettings(row: Row | null): StoreSettings {
     facebookUrl: (row.facebook_url as string) ?? "",
     instagramUrl: (row.instagram_url as string) ?? "",
     youtubeUrl: (row.youtube_url as string) ?? "",
-    deliveryInsideDhaka: Number(row.delivery_inside_dhaka ?? 70),
+    deliveryInsideDhaka: Number(row.delivery_inside_dhaka ?? 60),
     deliveryOutsideDhaka: Number(row.delivery_outside_dhaka ?? 120),
     deliveryTimeInside: (row.delivery_time_inside as string) ?? "",
     deliveryTimeOutside: (row.delivery_time_outside as string) ?? "",
     exchangeWindowDays: Number(row.exchange_window_days ?? 7),
     codEnabled: Boolean(row.cod_enabled ?? 1),
+    flashSaleEnabled: row.flash_sale_enabled != null ? Boolean(row.flash_sale_enabled) : defaultSettings.flashSaleEnabled,
+    flashSaleTitleBn: (row.flash_sale_title_bn as string) || defaultSettings.flashSaleTitleBn,
+    flashSaleTitleEn: (row.flash_sale_title_en as string) || defaultSettings.flashSaleTitleEn,
+    flashSaleEndTime: (row.flash_sale_end_time as string) || defaultSettings.flashSaleEndTime,
   };
 }
 
@@ -305,10 +308,9 @@ export async function fetchHomeSections() {
   };
 }
 
-export async function fetchFacets(): Promise<{ sizes: string[]; colors: ProductColor[] }> {
+export async function fetchFacets(): Promise<{ sizes: string[] }> {
   const list = await fetchActiveProducts();
   return {
     sizes: Array.from(new Set(list.flatMap((p) => p.sizes))),
-    colors: Array.from(new Map(list.flatMap((p) => p.colors).map((c) => [c.name, c])).values()),
   };
 }

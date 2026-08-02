@@ -23,7 +23,7 @@ export type Product = {
   regularPrice: number;
   salePrice: number | null;
   sizes: string[];
-  colors: ProductColor[];
+  colors?: ProductColor[];
   stock: number;
   sku: string;
   featured: boolean;
@@ -76,6 +76,10 @@ export type StoreSettings = {
   deliveryTimeOutside: string;
   exchangeWindowDays: number;
   codEnabled: boolean;
+  flashSaleEnabled?: boolean;
+  flashSaleTitleBn?: string;
+  flashSaleTitleEn?: string;
+  flashSaleEndTime?: string;
 };
 
 export type CartLine = {
@@ -85,7 +89,7 @@ export type CartLine = {
   image: string;
   unitPrice: number;
   size: string;
-  color: string;
+  color?: string;
   quantity: number;
   maxQuantity: number;
 };
@@ -94,7 +98,7 @@ export type OrderCustomer = {
   fullName: string;
   mobile: string;
   district: string;
-  area: string;
+  area?: string;
   address: string;
   note?: string;
 };
@@ -129,7 +133,7 @@ export type OrderItem = {
   name: string;
   image: string;
   size: string;
-  color: string;
+  color?: string;
   unitPrice: number;
   quantity: number;
 };
@@ -140,7 +144,7 @@ export type Order = {
   fullName: string;
   mobile: string;
   district: string;
-  area: string;
+  area?: string;
   address: string;
   note: string;
   subtotal: number;

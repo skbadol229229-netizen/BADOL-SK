@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import { EmptyState, ErrorState } from "@/components/ui-states";
 import { ProductGrid, ProductGridSkeleton } from "@/components/product-card";
-import { fetchFacets, fetchProducts, type ProductFilters } from "@/data/api";
+import { fetchProducts, type ProductFilters } from "@/data/api";
 import { useCategories } from "@/hooks/use-store";
+import { useLanguage } from "@/context/language";
 
 export function ProductBrowser({
   fixedCategory,
@@ -14,23 +16,14 @@ export function ProductBrowser({
   heading?: string;
 }) {
   const categories = useCategories();
-  const { data: facets } = useQuery({
-    queryKey: ["product-facets"],
-    queryFn: fetchFacets,
-    staleTime: 60_000,
-  });
-  const allSizes = facets?.sizes ?? [];
-  const allColors = facets?.colors ?? [];
-
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
+  const { lang } = useLanguage();
   const [category, setCategory] = useState<string | undefined>(fixedCategory);
+  const [search, setSearch] = useState("");
   const [sort, setSort] = useState<ProductFilters["sort"]>("featured");
 
   const filters: ProductFilters = {
     category: fixedCategory ?? category,
-    sizes,
-    colors,
+    search: search.trim() || undefined,
     sort,
   };
 
@@ -39,32 +32,35 @@ export function ProductBrowser({
     queryFn: () => fetchProducts(filters),
   });
 
-  function toggle(list: string[], value: string, setter: (v: string[]) => void) {
-    setter(list.includes(value) ? list.filter((v) => v !== value) : [...list, value]);
-  }
-
-  const chipClass = (active: boolean) => `chip ${active ? "chip-active" : ""}`;
-
-  const hasFilters = sizes.length > 0 || colors.length > 0 || (!fixedCategory && !!category);
+  const activeCategoryObj = categories.find((c) => c.slug === category);
 
   return (
     <>
-      <div className="mb-8 space-y-4 border-y border-border py-5">
+      {/* Category Pills & Search Bar */}
+      <div className="mb-8 space-y-4 rounded-2xl border border-border bg-card p-4 md:p-6 shadow-xs">
         {!fixedCategory && (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             <button
               type="button"
               onClick={() => setCategory(undefined)}
-              className={chipClass(!category)}
+              className={`shrink-0 rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
+                !category
+                  ? "bg-[#0B2E13] text-white shadow-xs"
+                  : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
             >
-              All
+              {lang === "bn" ? "সকল পণ্য" : "All Products"}
             </button>
             {categories.map((c) => (
               <button
                 key={c.slug}
                 type="button"
                 onClick={() => setCategory(c.slug)}
-                className={chipClass(category === c.slug)}
+                className={`shrink-0 rounded-xl px-4 py-2 text-xs font-semibold transition-all ${
+                  category === c.slug
+                    ? "bg-[#0B2E13] text-white shadow-xs"
+                    : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
               >
                 {c.name}
               </button>
@@ -72,73 +68,51 @@ export function ProductBrowser({
           </div>
         )}
 
-        <div>
-          <p className="label-caps mb-2 text-muted-foreground">Size</p>
-          <div className="flex flex-wrap gap-2">
-            {allSizes.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => toggle(sizes, s, setSizes)}
-                className={chipClass(sizes.includes(s))}
-                aria-pressed={sizes.includes(s)}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="label-caps mb-2 text-muted-foreground">Colour</p>
-          <div className="flex flex-wrap gap-2">
-            {allColors.map((c) => (
-              <button
-                key={c.name}
-                type="button"
-                onClick={() => toggle(colors, c.name, setColors)}
-                className={chipClass(colors.includes(c.name))}
-                aria-pressed={colors.includes(c.name)}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 pt-1">
-          <p className="text-xs text-muted-foreground">
-            {isPending ? "Loading products…" : `${data?.length ?? 0} products`}
-            {heading ? ` in ${heading}` : ""}
-          </p>
-          <div className="flex min-w-0 items-center gap-4">
-            {hasFilters && (
+        {/* Filter Controls Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/60">
+          <div className="relative flex-1 max-w-xs">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={lang === "bn" ? "পণ্য দিয়ে খুঁজুন..." : "Search products..."}
+              className="h-10 w-full rounded-xl border border-border bg-background pl-9 pr-8 text-xs outline-none focus:border-primary"
+            />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            {search && (
               <button
                 type="button"
-                onClick={() => {
-                  setSizes([]);
-                  setColors([]);
-                  if (!fixedCategory) setCategory(undefined);
-                }}
-                className="text-xs underline underline-offset-4"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
               >
-                Clear filters
+                <X className="h-4 w-4" />
               </button>
             )}
-            <label htmlFor="sort" className="sr-only">
-              Sort products
-            </label>
-            <select
-              id="sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as ProductFilters["sort"])}
-              className="h-11 min-w-0 border border-border bg-background px-3 text-xs"
-            >
-              <option value="featured">Featured</option>
-              <option value="newest">Newest</option>
-              <option value="price-asc">Price: low to high</option>
-              <option value="price-desc">Price: high to low</option>
-            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <p className="text-xs font-medium text-muted-foreground whitespace-nowrap hidden sm:block">
+              {isPending
+                ? lang === "bn"
+                  ? "লোড হচ্ছে..."
+                  : "Loading..."
+                : `${data?.length ?? 0} ${lang === "bn" ? "টি পণ্য" : "products"}`}
+            </p>
+
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+              <select
+                id="sort"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as ProductFilters["sort"])}
+                className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium outline-none focus:border-primary"
+              >
+                <option value="featured">{lang === "bn" ? "পছন্দনীয় (Featured)" : "Featured"}</option>
+                <option value="newest">{lang === "bn" ? "নতুন পণ্য (Newest)" : "Newest"}</option>
+                <option value="price-asc">{lang === "bn" ? "দাম: কম থেকে বেশি" : "Price: Low to High"}</option>
+                <option value="price-desc">{lang === "bn" ? "দাম: বেশি থেকে কম" : "Price: High to Low"}</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -147,12 +121,23 @@ export function ProductBrowser({
       {isError && <ErrorState onRetry={() => refetch()} />}
       {data && data.length === 0 && (
         <EmptyState
-          title="No products match these filters"
-          description="Try removing a size or colour filter to see more of the collection."
+          title={lang === "bn" ? "কোনো পণ্য পাওয়া যায়নি" : "No products found"}
+          description={
+            lang === "bn"
+              ? "আপনার কাঙ্ক্ষিত পণ্যটি খুঁজতে অন্য ক্যাটাগরি বা শব্দ ব্যবহার করুন।"
+              : "Try clearing search or selecting a different category."
+          }
           action={
-            <Link to="/shop" className="btn btn-outline">
-              Shop all
-            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setCategory(undefined);
+              }}
+              className="btn btn-solid"
+            >
+              {lang === "bn" ? "সব পণ্য দেখুন" : "View All Products"}
+            </button>
           }
         />
       )}

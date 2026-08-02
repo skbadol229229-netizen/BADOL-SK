@@ -63,7 +63,6 @@ function ProductPage() {
 
   const [activeImage, setActiveImage] = useState(0);
   const [size, setSize] = useState<string | null>(product.sizes[0] ?? null);
-  const [color, setColor] = useState<string | null>(product.colors[0]?.name ?? null);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -82,12 +81,8 @@ function ProductPage() {
   });
 
   function handleAdd() {
-    if (!size) {
-      setError("Please select a size.");
-      return;
-    }
-    if (!color) {
-      setError("Please select a colour.");
+    if (product.sizes.length > 0 && !size) {
+      setError("Please select a size / weight.");
       return;
     }
     setError(null);
@@ -98,12 +93,11 @@ function ProductPage() {
       name: product.name,
       image: product.images[0],
       unitPrice: price,
-      size,
-      color,
+      size: size ?? "Standard",
       quantity,
       maxQuantity: Math.max(1, Math.min(product.stock, 10)),
     });
-    toast.success("Added to cart", { description: `${product.name} · ${size} · ${color}` });
+    toast.success("Added to cart", { description: `${product.name} ${size ? `· ${size}` : ""}` });
     window.setTimeout(() => setAdding(false), 400);
   }
 
@@ -174,52 +168,28 @@ function ProductPage() {
             )}
           </div>
 
-          <div className="mt-8">
-            <p className="label-caps text-muted-foreground">Size</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {product.sizes.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  disabled={soldOut}
-                  onClick={() => {
-                    setSize(s);
-                    setError(null);
-                  }}
-                  className={optionClass(size === s, soldOut)}
-                  aria-pressed={size === s}
-                >
-                  {s}
-                </button>
-              ))}
+          {product.sizes.length > 0 && (
+            <div className="mt-8">
+              <p className="label-caps text-muted-foreground">Size / Weight</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {product.sizes.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    disabled={soldOut}
+                    onClick={() => {
+                      setSize(s);
+                      setError(null);
+                    }}
+                    className={optionClass(size === s, soldOut)}
+                    aria-pressed={size === s}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-
-          <div className="mt-6">
-            <p className="label-caps text-muted-foreground">Colour</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {product.colors.map((c) => (
-                <button
-                  key={c.name}
-                  type="button"
-                  disabled={soldOut}
-                  onClick={() => {
-                    setColor(c.name);
-                    setError(null);
-                  }}
-                  className={optionClass(color === c.name, soldOut)}
-                  aria-pressed={color === c.name}
-                >
-                  <span
-                    aria-hidden
-                    className="h-3 w-3 rounded-full border border-border"
-                    style={{ backgroundColor: c.hex }}
-                  />
-                  {c.name}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
           <div className="mt-6 flex items-center gap-4">
             <p className="label-caps text-muted-foreground">Qty</p>

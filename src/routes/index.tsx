@@ -9,6 +9,7 @@ import { fetchHomeSections } from "@/data/api";
 import { useCategories } from "@/hooks/use-store";
 import { useLanguage } from "@/context/language";
 import { TestimonialsSection } from "@/components/testimonials-section";
+import { FlashSaleSection } from "@/components/flash-sale-section";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -220,6 +221,11 @@ function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* FLASH SALE / LIMITED TIME OFFER COUNTDOWN SECTION */}
+      <Container>
+        <FlashSaleSection />
+      </Container>
 
       {/* BEST SELLERS PRODUCT SECTION */}
       <Container className="mt-8">

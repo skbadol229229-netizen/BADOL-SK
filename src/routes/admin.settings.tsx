@@ -169,6 +169,49 @@ function AdminSettingsPage() {
         </AdminCard>
 
         <AdminCard>
+          <p className="a-section-title">Flash Sale / Limited Time Offer</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Control the high-converting countdown section displayed on the storefront home page.
+          </p>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="flex min-h-[44px] items-center gap-2 text-sm md:col-span-2">
+              <input
+                type="checkbox"
+                checked={form.flashSaleEnabled ?? true}
+                onChange={(e) => set("flashSaleEnabled", e.target.checked)}
+                className="h-4 w-4"
+              />
+              Show Flash Sale countdown section on homepage
+            </label>
+            <Field label="Banner Title (Bangla)">
+              <input
+                value={form.flashSaleTitleBn ?? ""}
+                onChange={(e) => set("flashSaleTitleBn", e.target.value)}
+                placeholder="🔥 সীমিত সময়ের জন্য ধামাকা অফার - অফার শেষ হতে বাকী!"
+                className="a-input"
+              />
+            </Field>
+            <Field label="Banner Title (English)">
+              <input
+                value={form.flashSaleTitleEn ?? ""}
+                onChange={(e) => set("flashSaleTitleEn", e.target.value)}
+                placeholder="🔥 Limited Time Flash Offer - Ending Soon!"
+                className="a-input"
+              />
+            </Field>
+            <Field label="Offer End Time (ISO Date/Time or timestamp)" hint="e.g. 2026-08-03T23:59:59">
+              <input
+                type="text"
+                value={form.flashSaleEndTime ?? ""}
+                onChange={(e) => set("flashSaleEndTime", e.target.value)}
+                placeholder="2026-08-03T23:59:59"
+                className="a-input"
+              />
+            </Field>
+          </div>
+        </AdminCard>
+
+        <AdminCard>
           <p className="a-section-title">Contact</p>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Field label="Support phone">

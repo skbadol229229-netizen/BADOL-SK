@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, PhoneCall, ShoppingBag, Truck, Package, ArrowRight } from "lucide-react";
 import { Container, EmptyState } from "@/components/ui-states";
 import { readOrder } from "@/lib/order-storage";
 import type { PlacedOrder } from "@/data/types";
 import { formatBDT } from "@/lib/format";
 import { useSettings } from "@/hooks/use-store";
+import { useLanguage } from "@/context/language";
 
 export const Route = createFileRoute("/order-success")({
   head: () => ({
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/order-success")({
 
 function OrderSuccessPage() {
   const storeSettings = useSettings();
+  const { lang } = useLanguage();
   const [order, setOrder] = useState<PlacedOrder | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -40,9 +42,9 @@ function OrderSuccessPage() {
     return (
       <Container className="py-16">
         <div className="mx-auto max-w-lg animate-pulse space-y-4">
-          <div className="h-6 w-2/3 bg-secondary" />
-          <div className="h-4 w-1/2 bg-secondary" />
-          <div className="h-40 w-full bg-secondary" />
+          <div className="h-6 w-2/3 bg-secondary rounded-xl" />
+          <div className="h-4 w-1/2 bg-secondary rounded-xl" />
+          <div className="h-40 w-full bg-secondary rounded-2xl" />
         </div>
       </Container>
     );
@@ -52,11 +54,15 @@ function OrderSuccessPage() {
     return (
       <Container className="py-16">
         <EmptyState
-          title="No recent order found"
-          description="We couldn't find a recent order in this browser session."
+          title={lang === "bn" ? "সাম্প্রতিক কোনো অর্ডার পাওয়া যায়নি" : "No recent order found"}
+          description={
+            lang === "bn"
+              ? "আপনার ব্রাউজারে সাম্প্রতিক কোনো অর্ডারের তথ্য নেই।"
+              : "We couldn't find a recent order in this browser session."
+          }
           action={
             <Link to="/shop" className="btn btn-solid">
-              Shop all products
+              {lang === "bn" ? "পণ্য কেনাকাটা করুন" : "Shop All Products"}
             </Link>
           }
         />
@@ -64,96 +70,149 @@ function OrderSuccessPage() {
     );
   }
 
-  return (
-    <Container className="py-12 md:py-20">
-      <div className="mx-auto max-w-2xl">
-        <CheckCircle2 className="h-10 w-10 text-success" />
-        <h1 className="type-h1 mt-5">Thank you, {order.customer.fullName.split(" ")[0]}</h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Your order is confirmed. Our team will call {order.customer.mobile} to verify before
-          dispatch. Keep {formatBDT(order.total)} ready for the courier.
-        </p>
+  const firstName = order.customer.fullName.split(" ")[0];
 
-        <div className="mt-8 border border-border">
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-secondary px-5 py-4">
-            <div>
-              <p className="label-caps text-muted-foreground">Order number</p>
-              <p className="mt-1 text-lg font-medium">{order.orderNumber}</p>
-            </div>
-            <div className="text-right">
-              <p className="label-caps text-muted-foreground">Payment</p>
-              <p className="mt-1 text-sm">Cash on delivery</p>
-            </div>
+  return (
+    <div className="min-h-screen bg-muted/20 py-10 md:py-16">
+      <Container className="max-w-3xl">
+        {/* Success Card Header */}
+        <div className="rounded-3xl border border-primary/20 bg-card p-6 sm:p-10 shadow-xl text-center relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#0B2E13] via-[#7CB342] to-[#0B2E13]" />
+
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 mb-4 animate-bounce" style={{ animationDuration: "3s" }}>
+            <CheckCircle2 className="h-12 w-12 text-emerald-600" />
           </div>
 
-          <ul className="divide-y divide-border px-5">
+          <span className="block text-xs font-bold uppercase tracking-wider text-[#7CB342] mb-1">
+            {lang === "bn" ? "অর্ডার নিশ্চিত করা হয়েছে" : "Order Successfully Confirmed"}
+          </span>
+
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0B2E13] dark:text-emerald-300">
+            {lang === "bn"
+              ? `ধন্যবাদ, ${firstName}! আপনার অর্ডারটি গৃহীত হয়েছে।`
+              : `Thank you, ${firstName}! Your order is placed.`}
+          </h1>
+
+          <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-lg mx-auto">
+            {lang === "bn"
+              ? `আমাদের রিপ্রেজেন্টেটিভ শীঘ্রই ${order.customer.mobile} নম্বরে কল করে অর্ডারটি কনফার্ম করবেন। পার্সেল ডেলিভারির সময় রাইডারকে ${formatBDT(order.total)} প্রদান করুন।`
+              : `Our customer team will call ${order.customer.mobile} shortly to verify delivery. Please keep ${formatBDT(order.total)} cash ready.`}
+          </p>
+
+          {/* Quick Stats Badges */}
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-muted/80 px-4 py-1.5 text-xs font-bold text-foreground">
+              <Package className="h-4 w-4 text-primary" />
+              <span>
+                {lang === "bn" ? "অর্ডার নং: " : "Order #: "}
+                <strong className="text-primary">{order.orderNumber}</strong>
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-muted/80 px-4 py-1.5 text-xs font-bold text-foreground">
+              <Truck className="h-4 w-4 text-primary" />
+              <span>
+                {order.customer.district === "Dhaka"
+                  ? storeSettings.deliveryTimeInside
+                  : storeSettings.deliveryTimeOutside}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Details Accordion Box */}
+        <div className="mt-8 rounded-3xl border border-border bg-card overflow-hidden shadow-lg">
+          <div className="bg-[#0B2E13] px-6 py-4 text-white flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5 text-[#7CB342]" />
+              <span className="font-extrabold text-sm sm:text-base">
+                {lang === "bn" ? "অর্ডারের বিবরণ" : "Order Breakdown"}
+              </span>
+            </div>
+            <span className="text-xs bg-white/10 px-3 py-1 rounded-full font-semibold">
+              {lang === "bn" ? "ক্যাশ অন ডেলিভারি" : "Cash on Delivery"}
+            </span>
+          </div>
+
+          {/* Line Items */}
+          <ul className="divide-y divide-border px-6 py-2">
             {order.lines.map((l) => (
-              <li key={`${l.productId}-${l.size}-${l.color}`} className="flex min-w-0 gap-4 py-4">
+              <li key={`${l.productId}-${l.size}`} className="py-4 flex gap-4 items-center">
                 <img
                   src={l.image}
-                  alt=""
-                  width={800}
-                  height={1000}
-                  loading="lazy"
-                  className="h-20 shrink-0 bg-secondary object-cover"
-                  style={{ width: 64 }}
+                  alt={l.name}
+                  className="h-16 w-16 shrink-0 rounded-2xl object-cover bg-muted border border-border"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{l.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {l.size} · {l.color} · ×{l.quantity}
+                  <p className="text-sm font-bold text-foreground truncate">{l.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {l.size ? `সাইজ/ওজন: ${l.size} · ` : ""}পরিমাণ: {l.quantity}
                   </p>
                 </div>
-                <span className="shrink-0 text-sm">{formatBDT(l.unitPrice * l.quantity)}</span>
+                <span className="text-sm font-black text-foreground shrink-0">
+                  {formatBDT(l.unitPrice * l.quantity)}
+                </span>
               </li>
             ))}
           </ul>
 
-          <dl className="space-y-2 border-t border-border px-5 py-4 text-sm">
+          {/* Pricing Totals */}
+          <div className="bg-muted/30 border-t border-border px-6 py-4 space-y-2 text-xs font-semibold text-foreground">
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">Subtotal</dt>
-              <dd>{formatBDT(order.subtotal)}</dd>
+              <span className="text-muted-foreground">{lang === "bn" ? "পণ্যের মোট দাম" : "Subtotal"}</span>
+              <span>{formatBDT(order.subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <dt className="text-muted-foreground">Delivery</dt>
-              <dd>{formatBDT(order.deliveryCharge)}</dd>
+              <span className="text-muted-foreground">{lang === "bn" ? "ডেলিভারি চার্জ" : "Delivery Fee"}</span>
+              <span>{formatBDT(order.deliveryCharge)}</span>
             </div>
-            <div className="flex justify-between border-t border-border pt-2 text-base font-medium">
-              <dt>Total payable</dt>
-              <dd>{formatBDT(order.total)}</dd>
+            <div className="flex justify-between border-t border-border/80 pt-3 text-sm font-black text-[#0B2E13] dark:text-emerald-300">
+              <span>{lang === "bn" ? "সর্বমোট টাকা" : "Total Amount"}</span>
+              <span className="text-base text-primary">{formatBDT(order.total)}</span>
             </div>
-          </dl>
+          </div>
 
-          <div className="border-t border-border px-5 py-4 text-sm">
-            <p className="label-caps text-muted-foreground">Delivering to</p>
-            <p className="mt-2 leading-relaxed text-muted-foreground">
-              {order.customer.address}, {order.customer.area}, {order.customer.district}
+          {/* Delivery Address Box */}
+          <div className="border-t border-border px-6 py-5 bg-card text-xs space-y-1.5">
+            <p className="font-extrabold uppercase tracking-wider text-[#0B2E13] dark:text-emerald-300">
+              📍 {lang === "bn" ? "ডেলিভারি ঠিকানা" : "Shipping Address"}
+            </p>
+            <p className="text-foreground font-medium text-sm">
+              {order.customer.fullName} ({order.customer.mobile})
+            </p>
+            <p className="text-muted-foreground leading-relaxed">
+              {order.customer.address}, {order.customer.district}
             </p>
             {order.customer.note && (
-              <p className="mt-2 text-xs text-muted-foreground">Note: {order.customer.note}</p>
+              <p className="text-muted-foreground italic pt-1">
+                {lang === "bn" ? "বিশেষ নোট: " : "Note: "}{order.customer.note}
+              </p>
             )}
           </div>
         </div>
 
-        <p className="mt-6 text-sm text-muted-foreground">
-          Expected delivery:{" "}
-          {order.customer.district === "Dhaka"
-            ? storeSettings.deliveryTimeInside
-            : storeSettings.deliveryTimeOutside}
-          . Questions? Call{" "}
-          <a href={`tel:${storeSettings.supportPhone}`} className="underline underline-offset-4">
-            {storeSettings.supportPhone}
+        {/* Action Buttons & Hotline */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <a
+            href={`tel:${storeSettings.supportPhone}`}
+            className="inline-flex items-center gap-2 rounded-xl bg-primary/10 px-5 py-3 text-xs font-bold text-primary border border-primary/20 hover:bg-primary/20 transition-colors w-full sm:w-auto justify-center"
+          >
+            <PhoneCall className="h-4 w-4" />
+            <span>
+              {lang === "bn"
+                ? `সহায়তার জন্য কল করুন: ${storeSettings.supportPhone}`
+                : `Need Help? Call: ${storeSettings.supportPhone}`}
+            </span>
           </a>
-          .
-        </p>
 
-        <Link
-          to="/shop"
-          className="mt-8 inline-flex h-12 items-center justify-center bg-foreground px-8 text-sm font-medium text-background"
-        >
-          Continue shopping
-        </Link>
-      </div>
-    </Container>
+          <Link
+            to="/shop"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#0B2E13] px-6 py-3.5 text-xs font-bold text-white transition-all hover:bg-[#0B2E13]/90 shadow-lg w-full sm:w-auto justify-center"
+          >
+            <span>{lang === "bn" ? "আরও কেনাকাটা করুন" : "Continue Shopping"}</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </Container>
+    </div>
   );
 }

@@ -11,7 +11,7 @@ const TABS = [
   "Basic",
   "Pricing",
   "Images",
-  "Sizes & colours",
+  "Sizes & Weights",
   "Inventory",
   "Details",
   "Visibility",
@@ -238,10 +238,10 @@ export function ProductForm({
             </Field>
           )}
 
-          {tab === "Sizes & colours" && (
+          {tab === "Sizes & Weights" && (
             <div className="space-y-6">
               <div>
-                <p className="a-label">Sizes</p>
+                <p className="a-label">Sizes / Weights / Quantities (e.g. 500g, 1kg, 2kg, 1 Dozen)</p>
                 <div className="flex flex-wrap gap-2">
                   {sizeOptions.map((size) => {
                     const on = form.sizes.includes(size);
@@ -267,7 +267,7 @@ export function ProductForm({
                         addCustomSize();
                       }
                     }}
-                    placeholder="Add a custom size, e.g. 3XL"
+                    placeholder="Add custom size/weight, e.g. 500g, 1kg"
                     className="a-input max-w-xs"
                   />
                   <button type="button" onClick={addCustomSize} className="a-btn a-btn-outline">
@@ -275,49 +275,6 @@ export function ProductForm({
                   </button>
                 </div>
                 <p className="a-hint">Selected: {form.sizes.join(", ") || "none"}</p>
-              </div>
-
-              <div>
-                <p className="a-label">Colours</p>
-                <div className="space-y-2">
-                  {form.colors.map((c, i) => (
-                    <div key={i} className="flex flex-wrap items-center gap-2">
-                      <input
-                        value={c.name}
-                        onChange={(e) => updateColor(i, { name: e.target.value })}
-                        placeholder="Colour name"
-                        className="a-input min-w-0 flex-1"
-                      />
-                      <input
-                        type="color"
-                        value={/^#[0-9a-fA-F]{6}$/.test(c.hex) ? c.hex : "#000000"}
-                        onChange={(e) => updateColor(i, { hex: e.target.value })}
-                        className="h-11 w-12 shrink-0 cursor-pointer rounded-md border border-border bg-card"
-                        aria-label="Colour picker"
-                      />
-                      <input
-                        value={c.hex}
-                        onChange={(e) => updateColor(i, { hex: e.target.value })}
-                        placeholder="#000000"
-                        className="a-input w-28 shrink-0"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => set({ colors: form.colors.filter((_, j) => j !== i) })}
-                        className="a-btn a-btn-danger shrink-0"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => set({ colors: [...form.colors, { name: "", hex: "#000000" }] })}
-                  className="a-btn a-btn-outline mt-3"
-                >
-                  Add colour
-                </button>
               </div>
             </div>
           )}

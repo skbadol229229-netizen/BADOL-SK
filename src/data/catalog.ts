@@ -19,6 +19,10 @@ export const defaultSettings: StoreSettings = {
   deliveryTimeOutside: "24-48 hours refrigerated transit",
   exchangeWindowDays: 3,
   codEnabled: true,
+  flashSaleEnabled: true,
+  flashSaleTitleBn: "🔥 সীমিত সময়ের জন্য ধামাকা অফার - অফার শেষ হতে বাকী!",
+  flashSaleTitleEn: "🔥 Limited Time Flash Offer - Ending Soon!",
+  flashSaleEndTime: new Date(Date.now() + 7 * 3600 * 1000 + 45 * 60 * 1000).toISOString(),
 };
 
 export const defaultCategories: Category[] = [
