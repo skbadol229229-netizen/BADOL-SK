@@ -352,7 +352,7 @@ export async function adminUpdateCategory(id: string, input: CategoryInput): Pro
 }
 
 export async function adminDeleteCategory(id: string): Promise<void> {
-  await execSql("DELETE FROM categories WHERE id = ?", [id]);
+  await execSql("DELETE FROM categories WHERE id = ? OR slug = ?", [id, id]);
 }
 
 /* ---------------------------------- banners ------------------------------- */

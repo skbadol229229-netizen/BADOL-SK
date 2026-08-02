@@ -419,7 +419,7 @@ export const defaultProducts: Product[] = [
     fullDescription: "100% natural without stalks or foreign matter.",
     categorySlug: "organic-spices",
     images: [
-      "https://images.unsplash.com/photo-1509358271058-acd05cc93898?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1532336414038-cf19250c5757?auto=format&fit=crop&w=800&q=80",
     ],
     regularPrice: 190,
     salePrice: 160,
@@ -443,7 +443,7 @@ export const defaultProducts: Product[] = [
       "Essential Bangladeshi aromatic whole spice blend for biryani, polao, and desserts.",
     categorySlug: "organic-spices",
     images: [
-      "https://images.unsplash.com/photo-1509358271058-acd05cc93898?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=80",
     ],
     regularPrice: 420,
     salePrice: 380,
