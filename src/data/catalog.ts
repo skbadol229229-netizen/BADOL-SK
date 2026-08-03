@@ -99,19 +99,49 @@ export const defaultCategories: Category[] = [
   },
 ];
 
-export const defaultBanner: Banner = {
-  id: "hero-purebengal-1",
-  title: "Authentic Organic Food Store",
-  subtitle: "100% Pure & Chemical-Free Bangladeshi Organic Produce",
-  ctaLabel: "Shop Organic Harvest",
-  ctaHref: "/shop",
-  image:
-    "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
-  mobileImage:
-    "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
-  active: true,
-  sortOrder: 1,
-};
+export const defaultBanners: Banner[] = [
+  {
+    id: "hero-purebengal-1",
+    title: "Authentic Organic Food Store",
+    subtitle: "100% Pure & Chemical-Free Bangladeshi Organic Produce",
+    ctaLabel: "Shop Organic Harvest",
+    ctaHref: "/shop",
+    image:
+      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
+    mobileImage:
+      "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
+    active: true,
+    sortOrder: 1,
+  },
+  {
+    id: "hero-purebengal-2",
+    title: "Sundarban Raw Wild Honey",
+    subtitle: "100% Unpasteurized Raw Natural Honey harvested directly from mangrove forests",
+    ctaLabel: "Shop Pure Honey",
+    ctaHref: "/category/pure-honey",
+    image:
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=1200&q=80",
+    mobileImage:
+      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80",
+    active: true,
+    sortOrder: 2,
+  },
+  {
+    id: "hero-purebengal-3",
+    title: "Traditional Wood-Pressed Oils & Pure Ghee",
+    subtitle: "Pabna Desi Cow Ghee and Cold-Pressed Kather Ghani Mustard Oil",
+    ctaLabel: "Explore Oils & Ghee",
+    ctaHref: "/category/oils-and-ghee",
+    image:
+      "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=1200&q=80",
+    mobileImage:
+      "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80",
+    active: true,
+    sortOrder: 3,
+  },
+];
+
+export const defaultBanner: Banner = defaultBanners[0];
 
 export const defaultProducts: Product[] = [
   {

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import type { Product } from "@/data/types";
 import { useCart } from "@/context/cart";
 import { useLanguage } from "@/context/language";
-import { discountPercent, effectivePrice, formatBDT } from "@/lib/format";
+import { discountPercent, effectivePrice, formatBDT, getAdjustedPrices } from "@/lib/format";
 
 export function QuickViewModal({
   product,
@@ -48,10 +48,13 @@ export function QuickViewModal({
 
   if (!isOpen || !product) return null;
 
-  const price = effectivePrice(product.regularPrice, product.salePrice);
-  const off = discountPercent(product.regularPrice, product.salePrice);
-  const soldOut = product.stock <= 0;
   const currentSize = selectedSize ?? (product.sizes?.[0] || "Standard");
+  const adjustedPrices = getAdjustedPrices(product, currentSize);
+  const currentRegularPrice = adjustedPrices.regularPrice;
+  const currentSalePrice = adjustedPrices.salePrice;
+  const price = adjustedPrices.price;
+  const off = discountPercent(currentRegularPrice, currentSalePrice);
+  const soldOut = product.stock <= 0;
 
   const handleAddToCart = () => {
     if (soldOut) return;
@@ -173,7 +176,7 @@ export function QuickViewModal({
                 <span className="text-2xl font-black text-primary">{formatBDT(price)}</span>
                 {off !== null && (
                   <span className="text-sm font-semibold text-muted-foreground line-through">
-                    {formatBDT(product.regularPrice)}
+                    {formatBDT(currentRegularPrice)}
                   </span>
                 )}
               </div>

@@ -18,7 +18,7 @@ import { ProductGrid, ProductGridSkeleton } from "@/components/product-card";
 import { AppImage } from "@/components/app-image";
 import { fetchProduct, fetchRelated, fetchReviews } from "@/data/api";
 import { useSettings } from "@/hooks/use-store";
-import { discountPercent, effectivePrice, formatBDT } from "@/lib/format";
+import { discountPercent, effectivePrice, formatBDT, getAdjustedPrices } from "@/lib/format";
 import { useCart } from "@/context/cart";
 import { useLanguage } from "@/context/language";
 import type { Product } from "@/data/types";
@@ -80,8 +80,11 @@ function ProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const price = effectivePrice(product.regularPrice, product.salePrice);
-  const off = discountPercent(product.regularPrice, product.salePrice);
+  const adjustedPrices = getAdjustedPrices(product, size);
+  const currentRegularPrice = adjustedPrices.regularPrice;
+  const currentSalePrice = adjustedPrices.salePrice;
+  const price = adjustedPrices.price;
+  const off = discountPercent(currentRegularPrice, currentSalePrice);
   const soldOut = product.stock <= 0;
 
   const relatedQuery = useQuery({
@@ -245,10 +248,10 @@ function ProductPage() {
             {off !== null && (
               <>
                 <span className="text-base font-semibold text-muted-foreground line-through">
-                  {formatBDT(product.regularPrice)}
+                  {formatBDT(currentRegularPrice)}
                 </span>
                 <span className="rounded-lg bg-red-600/90 px-2.5 py-0.5 text-xs font-bold text-white">
-                  {lang === "bn" ? `ছাড় ৳${product.regularPrice - price}` : `Save ${off}%`}
+                  {lang === "bn" ? `ছাড় ৳${currentRegularPrice - price}` : `Save ${off}%`}
                 </span>
               </>
             )}

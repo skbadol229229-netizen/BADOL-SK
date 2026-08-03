@@ -5,7 +5,12 @@ import { toast } from "sonner";
 import { AdminCard, AdminShell, Field } from "@/components/admin/admin-shell";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import type { StoreSettings } from "@/data/types";
-import { adminFetchSettings, adminUpdateSettings } from "@/lib/admin";
+import {
+  adminFetchSettings,
+  adminUpdateSettings,
+  getAdminEmail,
+  updateAdminCredentials,
+} from "@/lib/admin";
 
 export const Route = createFileRoute("/admin/settings")({
   head: () => ({
@@ -28,9 +33,47 @@ function AdminSettingsPage() {
   const settings = useQuery({ queryKey: ["admin-settings"], queryFn: adminFetchSettings });
   const [form, setForm] = useState<StoreSettings | null>(null);
 
+  // Admin Account Credentials State
+  const [adminEmail, setAdminEmail] = useState("");
+  const [newAdminEmail, setNewAdminEmail] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [updatingAuth, setUpdatingAuth] = useState(false);
+
+  useEffect(() => {
+    getAdminEmail().then((email) => {
+      setAdminEmail(email);
+      setNewAdminEmail(email);
+    });
+  }, []);
+
   useEffect(() => {
     if (settings.data && !form) setForm(settings.data);
   }, [settings.data, form]);
+
+  const handleUpdateAdminAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail.trim()) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (newAdminPassword && newAdminPassword !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+    try {
+      setUpdatingAuth(true);
+      await updateAdminCredentials(adminEmail, newAdminEmail, newAdminPassword);
+      setAdminEmail(newAdminEmail);
+      setNewAdminPassword("");
+      setConfirmPassword("");
+      toast.success("Admin email and password updated successfully!");
+    } catch (e) {
+      toast.error((e as Error).message || "Failed to update admin credentials.");
+    } finally {
+      setUpdatingAuth(false);
+    }
+  };
 
   const save = useMutation({
     mutationFn: adminUpdateSettings,
@@ -268,6 +311,55 @@ function AdminSettingsPage() {
             </Field>
           </div>
         </AdminCard>
+
+        {/* ADMIN ACCOUNT SECURITY SETTINGS */}
+        <div className="pt-2">
+          <AdminCard>
+            <p className="a-section-title">Admin Account Credentials (email & password)</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Update the email address and password used to log into this admin panel.
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <Field label="Admin Email">
+                <input
+                  type="email"
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  className="a-input"
+                  required
+                />
+              </Field>
+              <Field label="New Password (leave blank to keep current)">
+                <input
+                  type="password"
+                  value={newAdminPassword}
+                  onChange={(e) => setNewAdminPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="a-input"
+                />
+              </Field>
+              <Field label="Confirm New Password">
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="a-input"
+                />
+              </Field>
+            </div>
+            <div className="mt-4 flex justify-start">
+              <button
+                type="button"
+                onClick={handleUpdateAdminAuth}
+                disabled={updatingAuth}
+                className="a-btn a-btn-secondary"
+              >
+                {updatingAuth ? "Updating Admin Auth…" : "Update Admin Account Details"}
+              </button>
+            </div>
+          </AdminCard>
+        </div>
 
         <button type="submit" disabled={save.isPending} className="a-btn a-btn-primary">
           {save.isPending ? "Saving…" : "Save settings"}

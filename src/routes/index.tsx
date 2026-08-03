@@ -5,7 +5,7 @@ import { ShieldCheck, Leaf, Truck, Sparkles, ChevronRight, Award } from "lucide-
 import { Container, ErrorState } from "@/components/ui-states";
 import { ProductGrid, ProductGridSkeleton } from "@/components/product-card";
 import { AppImage } from "@/components/app-image";
-import { fetchHomeSections } from "@/data/api";
+import { fetchBanners, fetchHomeSections } from "@/data/api";
 import { useCategories } from "@/hooks/use-store";
 import { useLanguage } from "@/context/language";
 import { TestimonialsSection } from "@/components/testimonials-section";
@@ -72,18 +72,26 @@ function HomePage() {
   const { lang, t } = useLanguage();
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const bannersQuery = useQuery({
+    queryKey: ["banners"],
+    queryFn: fetchBanners,
+  });
+
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["home-sections"],
     queryFn: fetchHomeSections,
   });
 
+  const banners = bannersQuery.data && bannersQuery.data.length > 0 ? bannersQuery.data : [];
+
   // Hero auto slide timer
   useEffect(() => {
+    if (banners.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners.length]);
 
   const trustBadges = [
     {
@@ -113,16 +121,16 @@ function HomePage() {
       {/* HERO SECTION SLIDER */}
       <section className="relative px-3 pt-3 sm:px-6 sm:pt-4 max-w-7xl mx-auto">
         <div className="relative aspect-[16/9] md:aspect-[21/9] min-h-[300px] sm:min-h-[380px] w-full overflow-hidden rounded-[24px] shadow-lg bg-[#0B2E13]">
-          {heroSlides.map((slide, index) => (
+          {banners.map((slide, index) => (
             <div
-              key={slide.id}
+              key={slide.id || index}
               className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
                 index === currentSlide ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
               }`}
             >
               <AppImage
                 src={slide.image}
-                alt="Hero Banner"
+                alt={slide.title || "Hero Banner"}
                 width={1400}
                 height={700}
                 eager={index === 0}
@@ -136,23 +144,25 @@ function HomePage() {
                 <div className="max-w-xl text-white">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-[#7CB342]/90 px-3 py-1 text-[11px] sm:text-xs font-bold text-white backdrop-blur-md shadow-xs">
                     <Sparkles className="h-3.5 w-3.5" />
-                    {lang === "bn" ? slide.badgeBn : slide.badgeEn}
+                    <span>🌿 Farm Fresh • 100% Certified Organic</span>
                   </span>
 
                   <h1 className="mt-2.5 sm:mt-3 text-2xl font-extrabold sm:text-3xl md:text-4xl leading-tight drop-shadow-md">
-                    {lang === "bn" ? slide.titleBn : slide.titleEn}
+                    {slide.title}
                   </h1>
 
-                  <p className="mt-2 text-xs sm:text-sm text-white/90 line-clamp-2 leading-relaxed max-w-md">
-                    {lang === "bn" ? slide.subtitleBn : slide.subtitleEn}
-                  </p>
+                  {slide.subtitle && (
+                    <p className="mt-2 text-xs sm:text-sm text-white/90 line-clamp-2 leading-relaxed max-w-md">
+                      {slide.subtitle}
+                    </p>
+                  )}
 
                   <div className="mt-4 sm:mt-6">
                     <Link
-                      to="/shop"
+                      to={(slide.ctaHref as string) || "/shop"}
                       className="inline-flex items-center gap-1.5 rounded-full bg-[#7CB342] hover:bg-[#689f38] px-5 py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg transition-transform active:scale-95"
                     >
-                      <span>{lang === "bn" ? slide.ctaBn : slide.ctaEn}</span>
+                      <span>{slide.ctaLabel || (lang === "bn" ? "এখনই কিনুন" : "Shop Now")}</span>
                       <ChevronRight className="h-4 w-4" />
                     </Link>
                   </div>
@@ -162,19 +172,21 @@ function HomePage() {
           ))}
 
           {/* Carousel Dots Indicator */}
-          <div className="absolute bottom-3 inset-x-0 z-20 flex justify-center items-center gap-2">
-            {heroSlides.map((_, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                className={`h-2 rounded-full transition-all ${
-                  idx === currentSlide ? "w-6 bg-white" : "w-2 bg-white/50"
-                }`}
-              />
-            ))}
-          </div>
+          {banners.length > 1 && (
+            <div className="absolute bottom-3 inset-x-0 z-20 flex justify-center items-center gap-2">
+              {banners.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setCurrentSlide(idx)}
+                  aria-label={`Go to slide ${idx + 1}`}
+                  className={`h-2 rounded-full transition-all ${
+                    idx === currentSlide ? "w-6 bg-white" : "w-2 bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,5 +1,11 @@
 import { execBatch, execSql, isTursoConfigured, queryRow, queryRows } from "@/lib/turso";
-import { defaultBanner, defaultCategories, defaultProducts, defaultSettings } from "@/data/catalog";
+import {
+  defaultBanner,
+  defaultBanners,
+  defaultCategories,
+  defaultProducts,
+  defaultSettings,
+} from "@/data/catalog";
 import { mapBanner, mapCategory, mapProduct, mapReview, mapSettings } from "@/data/api";
 import type {
   Banner,
@@ -82,6 +88,66 @@ export async function getAdminEmail(): Promise<string> {
     return session.email || "admin@organicbd.com";
   } catch {
     return "admin@organicbd.com";
+  }
+}
+
+export async function updateAdminCredentials(
+  currentEmail: string,
+  newEmail: string,
+  newPassword?: string,
+): Promise<void> {
+  const cleanNewEmail = newEmail.trim().toLowerCase();
+  const cleanCurrentEmail = currentEmail.trim().toLowerCase();
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(`
+        CREATE TABLE IF NOT EXISTS admin_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'admin'
+        );
+      `);
+
+      const existing = await queryRow<{ id: string }>(
+        "SELECT id FROM admin_users WHERE LOWER(email) = ?",
+        [cleanCurrentEmail],
+      );
+
+      if (existing) {
+        if (newPassword && newPassword.trim()) {
+          await execSql("UPDATE admin_users SET email = ?, password_hash = ? WHERE id = ?", [
+            cleanNewEmail,
+            newPassword.trim(),
+            existing.id,
+          ]);
+        } else {
+          await execSql("UPDATE admin_users SET email = ? WHERE id = ?", [
+            cleanNewEmail,
+            existing.id,
+          ]);
+        }
+      } else {
+        const id = "admin_" + Date.now().toString(36);
+        await execSql(
+          "INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, 'admin')",
+          [id, cleanNewEmail, newPassword?.trim() || "admin123"],
+        );
+      }
+    } catch (e) {
+      console.error("Error updating admin credentials in DB:", e);
+    }
+  }
+
+  // Always update local session
+  try {
+    window.localStorage.setItem(
+      ADMIN_SESSION_KEY,
+      JSON.stringify({ email: cleanNewEmail, time: Date.now() }),
+    );
+  } catch {
+    /* storage unavailable */
   }
 }
 
@@ -362,10 +428,10 @@ export type BannerInput = Omit<Banner, "id">;
 export async function adminListBanners(): Promise<Banner[]> {
   try {
     const rows = await queryRows("SELECT * FROM banners ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return [defaultBanner];
+    if (!rows || rows.length === 0) return defaultBanners;
     return rows.map(mapBanner);
   } catch {
-    return [defaultBanner];
+    return defaultBanners;
   }
 }
 

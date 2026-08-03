@@ -2,7 +2,13 @@
  * Storefront data-access layer, backed by Turso (libSQL).
  */
 import { queryRow, queryRows } from "@/lib/turso";
-import { defaultBanner, defaultCategories, defaultProducts, defaultSettings } from "./catalog";
+import {
+  defaultBanner,
+  defaultBanners,
+  defaultCategories,
+  defaultProducts,
+  defaultSettings,
+} from "./catalog";
 import type { Banner, Category, Product, ProductColor, Review, StoreSettings } from "./types";
 
 type Row = Record<string, unknown>;
@@ -159,10 +165,10 @@ export async function fetchCategory(slug: string): Promise<Category | null> {
 export async function fetchBanners(): Promise<Banner[]> {
   try {
     const rows = await queryRows("SELECT * FROM banners WHERE active = 1 ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return [defaultBanner];
+    if (!rows || rows.length === 0) return defaultBanners;
     return rows.map(mapBanner);
   } catch {
-    return [defaultBanner];
+    return defaultBanners;
   }
 }
 
