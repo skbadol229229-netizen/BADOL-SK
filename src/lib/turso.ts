@@ -29,12 +29,21 @@ export const turso = createClient({
   authToken: rawToken || "placeholder",
 });
 
+function sanitizeArgs(args: (string | number | boolean | null)[]): (string | number | null)[] {
+  return args.map((a) => {
+    if (a === undefined) return "";
+    if (typeof a === "boolean") return a ? 1 : 0;
+    if (typeof a === "number" && isNaN(a)) return 0;
+    return a;
+  });
+}
+
 export async function queryRows<T = Record<string, unknown>>(
   sql: string,
   args: (string | number | boolean | null)[] = [],
 ): Promise<T[]> {
   if (!isTursoConfigured) return [];
-  const res = await turso.execute({ sql, args });
+  const res = await turso.execute({ sql, args: sanitizeArgs(args) });
   return (res.rows ?? []) as unknown as T[];
 }
 
@@ -43,7 +52,7 @@ export async function queryRow<T = Record<string, unknown>>(
   args: (string | number | boolean | null)[] = [],
 ): Promise<T | null> {
   if (!isTursoConfigured) return null;
-  const res = await turso.execute({ sql, args });
+  const res = await turso.execute({ sql, args: sanitizeArgs(args) });
   if (!res.rows || res.rows.length === 0) return null;
   return res.rows[0] as unknown as T;
 }
@@ -53,7 +62,7 @@ export async function execSql(
   args: (string | number | boolean | null)[] = [],
 ): Promise<void> {
   if (!isTursoConfigured) return;
-  await turso.execute({ sql, args });
+  await turso.execute({ sql, args: sanitizeArgs(args) });
 }
 
 export async function execBatch(
@@ -61,7 +70,7 @@ export async function execBatch(
 ): Promise<void> {
   if (!isTursoConfigured) return;
   await turso.batch(
-    statements.map((s) => ({ sql: s.sql, args: s.args ?? [] })),
+    statements.map((s) => ({ sql: s.sql, args: sanitizeArgs(s.args ?? []) })),
     "write",
   );
 }

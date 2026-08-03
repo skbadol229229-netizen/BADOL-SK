@@ -323,6 +323,12 @@ export async function adminListProducts(): Promise<Product[]> {
 export async function adminCreateProduct(input: ProductInput): Promise<void> {
   await ensureDbSchema();
   const id = "p_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const regPrice = Number(input.regularPrice) || 0;
+  const salePrice =
+    input.salePrice && !isNaN(Number(input.salePrice)) && Number(input.salePrice) > 0
+      ? Number(input.salePrice)
+      : 0;
+
   await execSql(
     `INSERT INTO products (
       id, name, slug, short_description, full_description, category_slug,
@@ -331,24 +337,24 @@ export async function adminCreateProduct(input: ProductInput): Promise<void> {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
-      input.name || "",
-      input.slug || "",
-      input.shortDescription || "",
-      input.fullDescription || "",
-      input.categorySlug || "",
-      JSON.stringify(input.images || []),
-      JSON.stringify(input.imagePublicIds || []),
-      input.regularPrice || 0,
-      input.salePrice ?? null,
-      JSON.stringify(input.sizes || []),
-      JSON.stringify(input.colors || []),
-      input.stock || 0,
-      input.sku || "",
+      String(input.name || ""),
+      String(input.slug || ""),
+      String(input.shortDescription || ""),
+      String(input.fullDescription || ""),
+      String(input.categorySlug || ""),
+      JSON.stringify(Array.isArray(input.images) ? input.images : []),
+      JSON.stringify(Array.isArray(input.imagePublicIds) ? input.imagePublicIds : []),
+      regPrice,
+      salePrice,
+      JSON.stringify(Array.isArray(input.sizes) ? input.sizes : []),
+      JSON.stringify(Array.isArray(input.colors) ? input.colors : []),
+      Math.round(Number(input.stock) || 0),
+      String(input.sku || ""),
       input.featured ? 1 : 0,
       input.bestSeller ? 1 : 0,
       input.newArrival ? 1 : 0,
       input.active ? 1 : 0,
-      input.sortOrder || 0,
+      Math.round(Number(input.sortOrder) || 0),
       new Date().toISOString(),
     ],
   );
@@ -356,6 +362,12 @@ export async function adminCreateProduct(input: ProductInput): Promise<void> {
 
 export async function adminUpdateProduct(id: string, input: ProductInput): Promise<void> {
   await ensureDbSchema();
+  const regPrice = Number(input.regularPrice) || 0;
+  const salePrice =
+    input.salePrice && !isNaN(Number(input.salePrice)) && Number(input.salePrice) > 0
+      ? Number(input.salePrice)
+      : 0;
+
   await execSql(
     `UPDATE products SET
       name = ?, slug = ?, short_description = ?, full_description = ?, category_slug = ?,
@@ -363,25 +375,25 @@ export async function adminUpdateProduct(id: string, input: ProductInput): Promi
       stock = ?, sku = ?, featured = ?, best_seller = ?, new_arrival = ?, active = ?, sort_order = ?
     WHERE id = ?`,
     [
-      input.name || "",
-      input.slug || "",
-      input.shortDescription || "",
-      input.fullDescription || "",
-      input.categorySlug || "",
-      JSON.stringify(input.images || []),
-      JSON.stringify(input.imagePublicIds || []),
-      input.regularPrice || 0,
-      input.salePrice ?? null,
-      JSON.stringify(input.sizes || []),
-      JSON.stringify(input.colors || []),
-      input.stock || 0,
-      input.sku || "",
+      String(input.name || ""),
+      String(input.slug || ""),
+      String(input.shortDescription || ""),
+      String(input.fullDescription || ""),
+      String(input.categorySlug || ""),
+      JSON.stringify(Array.isArray(input.images) ? input.images : []),
+      JSON.stringify(Array.isArray(input.imagePublicIds) ? input.imagePublicIds : []),
+      regPrice,
+      salePrice,
+      JSON.stringify(Array.isArray(input.sizes) ? input.sizes : []),
+      JSON.stringify(Array.isArray(input.colors) ? input.colors : []),
+      Math.round(Number(input.stock) || 0),
+      String(input.sku || ""),
       input.featured ? 1 : 0,
       input.bestSeller ? 1 : 0,
       input.newArrival ? 1 : 0,
       input.active ? 1 : 0,
-      input.sortOrder || 0,
-      id,
+      Math.round(Number(input.sortOrder) || 0),
+      String(id),
     ],
   );
 }
