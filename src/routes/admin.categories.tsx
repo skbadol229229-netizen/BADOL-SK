@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { AdminCard, AdminShell, Field } from "@/components/admin/admin-shell";
 import { ImageUploader } from "@/components/admin/image-uploader";
 import type { Category } from "@/data/types";
@@ -17,10 +17,10 @@ import {
 export const Route = createFileRoute("/admin/categories")({
   head: () => ({
     meta: [
-      { title: "Categories — Trikon Admin" },
-      { name: "description", content: "Manage the categories shown across the Trikon storefront." },
+      { title: "Categories — PureBengal Admin" },
+      { name: "description", content: "Manage organic categories shown across PureBengal." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Categories — Trikon Admin" },
+      { property: "og:title", content: "Categories — PureBengal Admin" },
       { property: "og:description", content: "Category management." },
     ],
   }),
@@ -93,7 +93,7 @@ function AdminCategoriesPage() {
   return (
     <AdminShell
       title="Categories"
-      description="Categories drive the storefront navigation and filters."
+      description="Organic food categories for storefront navigation."
       actions={
         <button
           type="button"
@@ -104,78 +104,108 @@ function AdminCategoriesPage() {
           className="a-btn a-btn-primary"
         >
           <Plus className="mr-2 h-4 w-4" />
-          New category
+          New Category
         </button>
       }
     >
       {form && (
-        <AdminCard className="mb-8">
-          <form onSubmit={submit} className="grid gap-4 md:grid-cols-2">
-            <Field label="Name">
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="a-input"
-              />
-            </Field>
-            <Field label="Slug" hint="Leave blank to generate from the name.">
-              <input
-                value={form.slug}
-                onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                className="a-input"
-              />
-            </Field>
-            <Field label="Image" hint="Uploaded to Cloudinary. Max 5 MB.">
-              <ImageUploader
-                aspect="aspect-[4/5]"
-                value={{ url: form.image, publicId: form.imagePublicId ?? "" }}
-                onChange={(next) =>
-                  setForm({ ...form, image: next.url, imagePublicId: next.publicId })
-                }
-              />
-            </Field>
-            <Field label="Sort order">
-              <input
-                type="number"
-                value={form.sortOrder}
-                onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
-                className="a-input"
-              />
-            </Field>
-            <Field label="Description">
-              <textarea
-                rows={3}
-                value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="a-input"
-              />
-            </Field>
-            <label className="flex min-h-[44px] items-center gap-2 self-end text-sm">
-              <input
-                type="checkbox"
-                checked={form.active}
-                onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                className="h-4 w-4"
-              />
-              Active
-            </label>
-            <div className="flex gap-3 md:col-span-2">
-              <button type="submit" disabled={save.isPending} className="a-btn a-btn-primary">
-                {save.isPending ? "Saving…" : editingId ? "Save changes" : "Create category"}
-              </button>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            aria-hidden="true"
+            onClick={() => {
+              setForm(null);
+              setEditingId(null);
+            }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+          />
+          <div className="relative z-10 w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <h3 className="text-base font-semibold text-foreground">
+                {editingId ? "Edit Organic Category" : "Add Organic Category"}
+              </h3>
               <button
                 type="button"
                 onClick={() => {
                   setForm(null);
                   setEditingId(null);
                 }}
-                className="a-btn a-btn-outline"
+                className="a-btn a-btn-ghost a-btn-icon rounded-full hover:bg-secondary"
               >
-                Cancel
+                <X className="h-4 w-4" />
               </button>
             </div>
-          </form>
-        </AdminCard>
+            <form onSubmit={submit} className="mt-4 space-y-4">
+              <Field label="Category Name">
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="a-input mt-1"
+                  placeholder="e.g. Pure Honey, Organic Mustard Oil"
+                />
+              </Field>
+              <Field label="URL Slug" hint="Leave blank to generate automatically.">
+                <input
+                  value={form.slug}
+                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                  className="a-input mt-1"
+                  placeholder={slugify(form.name) || "pure-honey"}
+                />
+              </Field>
+              <Field label="Category Image" hint="Square or banner image for category cards.">
+                <div className="mt-1">
+                  <ImageUploader
+                    aspect="aspect-square"
+                    value={{ url: form.image, publicId: form.imagePublicId ?? "" }}
+                    onChange={(next) =>
+                      setForm({ ...form, image: next.url, imagePublicId: next.publicId })
+                    }
+                  />
+                </div>
+              </Field>
+              <Field label="Sort Order">
+                <input
+                  type="number"
+                  value={form.sortOrder}
+                  onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) })}
+                  className="a-input mt-1"
+                />
+              </Field>
+              <Field label="Description">
+                <textarea
+                  rows={2}
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  className="a-input mt-1"
+                  placeholder="Short summary of items in this category"
+                />
+              </Field>
+              <label className="flex items-center gap-2 pt-1 text-sm font-medium">
+                <input
+                  type="checkbox"
+                  checked={form.active}
+                  onChange={(e) => setForm({ ...form, active: e.target.checked })}
+                  className="h-4 w-4 accent-primary"
+                />
+                Active (Visible on website)
+              </label>
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForm(null);
+                    setEditingId(null);
+                  }}
+                  className="a-btn a-btn-outline"
+                >
+                  Cancel
+                </button>
+                <button type="submit" disabled={save.isPending} className="a-btn a-btn-primary">
+                  {save.isPending ? "Saving…" : editingId ? "Save Changes" : "Create Category"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
 
       {categories.isPending && <p className="text-sm text-muted-foreground">Loading…</p>}

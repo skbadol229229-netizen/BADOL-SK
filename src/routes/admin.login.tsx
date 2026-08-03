@@ -6,10 +6,10 @@ import { checkAdmin, signInAdmin } from "@/lib/admin";
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
     meta: [
-      { title: "Admin sign in — Trikon Clothing" },
-      { name: "description", content: "Staff sign in for the Trikon Clothing store admin." },
+      { title: "Admin sign in — PureBengal Organic" },
+      { name: "description", content: "Staff sign in for PureBengal Organic Store admin." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "Admin sign in — Trikon Clothing" },
+      { property: "og:title", content: "Admin sign in — PureBengal Organic" },
       { property: "og:description", content: "Staff access only." },
     ],
   }),
@@ -33,13 +33,13 @@ function AdminLoginPage() {
     e.preventDefault();
     setError(null);
     if (!email.trim() || !password) {
-      setError("Enter your email and password.");
+      setError("Enter your admin email and password.");
       return;
     }
     setSubmitting(true);
     try {
       await signInAdmin(email.trim(), password);
-      toast.success("Signed in");
+      toast.success("Signed in successfully");
       navigate({ to: "/admin", replace: true });
     } catch (err) {
       setSubmitting(false);
@@ -49,19 +49,27 @@ function AdminLoginPage() {
 
   return (
     <div className="admin-theme grid min-h-screen place-items-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 [box-shadow:var(--admin-shadow-md)]">
-        <p className="font-serif-display text-2xl">TRIKON</p>
-        <p className="mt-1 text-xs text-muted-foreground">Store admin</p>
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-xl">
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground font-bold text-lg">
+            P
+          </div>
+          <div>
+            <p className="font-serif-display text-xl font-bold text-foreground">PureBengal</p>
+            <p className="text-xs text-muted-foreground">Organic Store Admin Panel</p>
+          </div>
+        </div>
 
-        <form onSubmit={onSubmit} className="mt-8 space-y-4">
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
           <label className="block">
-            <span className="a-section-title">Email</span>
+            <span className="a-section-title">Admin Email</span>
             <input
               type="email"
               autoComplete="email"
+              placeholder="skbadol229229@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="a-input mt-2"
+              className="a-input mt-1"
             />
           </label>
           <label className="block">
@@ -69,21 +77,26 @@ function AdminLoginPage() {
             <input
               type="password"
               autoComplete="current-password"
+              placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="a-input mt-2"
+              className="a-input mt-1"
             />
           </label>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
 
-          <button type="submit" disabled={submitting} className="a-btn a-btn-primary w-full">
-            {submitting ? "Signing in…" : "Sign in"}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="a-btn a-btn-primary w-full bg-primary text-primary-foreground"
+          >
+            {submitting ? "Signing in…" : "Sign in to Dashboard"}
           </button>
         </form>
 
-        <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-          Admin accounts are created by the store owner. There is no public registration.
+        <p className="mt-6 text-xs leading-relaxed text-muted-foreground text-center">
+          Restricted access for PureBengal Organic Store administrators.
         </p>
       </div>
     </div>

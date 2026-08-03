@@ -24,8 +24,9 @@ const ADMIN_SESSION_KEY = "dhaka_admin_session_v1";
 
 export async function signInAdmin(email: string, password: string): Promise<void> {
   const cleanEmail = email.trim().toLowerCase();
+  const DEFAULT_EMAIL = "skbadol229229@gmail.com";
+  const DEFAULT_PASS = "01965566396";
 
-  // If Turso is configured and admin_users exists, check DB
   if (isTursoConfigured) {
     try {
       const user = await queryRow<{ id: string; role: string; password_hash: string }>(
@@ -34,19 +35,22 @@ export async function signInAdmin(email: string, password: string): Promise<void
       );
       if (user) {
         if (user.password_hash !== password) {
-          throw new Error("Invalid email or password.");
+          throw new Error("Invalid email or password!");
         }
       } else {
-        // If no admin user exists in DB yet, create the first admin user automatically!
-        const id = "admin_" + Date.now().toString(36);
-        await execSql(
-          "INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, 'admin')",
-          [id, cleanEmail, password],
-        );
+        if (cleanEmail !== DEFAULT_EMAIL || password !== DEFAULT_PASS) {
+          throw new Error("Invalid email or password!");
+        }
       }
     } catch (e) {
       if ((e as Error).message.includes("Invalid email")) throw e;
-      // If table doesn't exist yet, allow fallback session
+      if (cleanEmail !== DEFAULT_EMAIL || password !== DEFAULT_PASS) {
+        throw new Error("Invalid email or password!");
+      }
+    }
+  } else {
+    if (cleanEmail !== DEFAULT_EMAIL || password !== DEFAULT_PASS) {
+      throw new Error("Invalid email or password!");
     }
   }
 
@@ -83,11 +87,11 @@ export async function signOutAdmin(): Promise<void> {
 export async function getAdminEmail(): Promise<string> {
   try {
     const raw = window.localStorage.getItem(ADMIN_SESSION_KEY);
-    if (!raw) return "admin@organicbd.com";
+    if (!raw) return "skbadol229229@gmail.com";
     const session = JSON.parse(raw) as { email: string };
-    return session.email || "admin@organicbd.com";
+    return session.email || "skbadol229229@gmail.com";
   } catch {
-    return "admin@organicbd.com";
+    return "skbadol229229@gmail.com";
   }
 }
 

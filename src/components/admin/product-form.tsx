@@ -11,7 +11,7 @@ const TABS = [
   "Basic",
   "Pricing",
   "Images",
-  "Sizes & Weights",
+  "Pack Sizes",
   "Inventory",
   "Details",
   "Visibility",
@@ -19,7 +19,7 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number];
 
-const BASE_SIZES = ["S", "M", "L", "XL", "XXL"];
+const BASE_SIZES = ["250g", "500g", "1kg", "2kg", "5kg", "500ml", "1 Liter", "5 Liters"];
 
 export function slugify(value: string) {
   return value
@@ -62,53 +62,50 @@ export function ProductForm({
   }
 
   function addCustomSize() {
-    const next = customSize.trim().toUpperCase();
+    const next = customSize.trim();
     if (!next || form.sizes.includes(next)) return;
     set({ sizes: [...form.sizes, next] });
     setCustomSize("");
   }
 
-  function updateColor(index: number, patch: Partial<ProductColor>) {
-    const colors = form.colors.map((c, i) => (i === index ? { ...c, ...patch } : c));
-    set({ colors });
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <button
-        type="button"
-        aria-label="Close product form"
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6">
+      {/* Overlay Backdrop */}
+      <div
+        aria-hidden="true"
         onClick={onCancel}
-        className="absolute inset-0 bg-foreground/40"
+        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
       />
-      <div className="relative flex h-full w-full max-w-3xl flex-col border-l border-border bg-card">
-        <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+
+      {/* Popup Modal Box */}
+      <div className="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
+        <header className="flex items-center justify-between gap-3 border-b border-border bg-card px-5 py-4">
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold">
-              {editing ? "Edit product" : "New product"}
+            <h2 className="truncate text-base font-semibold text-foreground">
+              {editing ? "Edit Organic Product" : "Add New Organic Product"}
             </h2>
             <p className="truncate text-xs text-muted-foreground">
-              {form.name || "Untitled product"}
+              {form.name || "Untitled Product"}
             </p>
           </div>
           <button
             type="button"
             onClick={onCancel}
-            className="a-btn a-btn-ghost a-btn-icon"
+            className="a-btn a-btn-ghost a-btn-icon rounded-full hover:bg-secondary"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
           </button>
         </header>
 
-        <div className="a-scroll border-b border-border bg-secondary">
-          <div className="flex min-w-max gap-1 px-2 py-2">
+        <div className="a-scroll border-b border-border bg-secondary/60">
+          <div className="flex min-w-max gap-1 px-3 py-2">
             {TABS.map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setTab(t)}
-                className={`a-btn ${tab === t ? "a-btn-primary" : "a-btn-ghost"}`}
+                className={`a-btn text-xs ${tab === t ? "a-btn-primary bg-primary text-primary-foreground font-semibold" : "a-btn-ghost"}`}
               >
                 {t}
               </button>
@@ -122,31 +119,31 @@ export function ProductForm({
             e.preventDefault();
             onSubmit(form, false);
           }}
-          className="flex-1 overflow-y-auto px-4 py-5"
+          className="flex-1 overflow-y-auto px-5 py-6 space-y-4"
         >
           {tab === "Basic" && (
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Product name" hint="Shown across the storefront.">
+              <Field label="Product Name" hint="Shown across the storefront.">
                 <input
                   value={form.name}
                   onChange={(e) => set({ name: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
                   placeholder="Sundarban Raw Wild Honey"
                 />
               </Field>
-              <Field label="URL slug" hint="Leave blank to generate from the name.">
+              <Field label="URL Slug" hint="Leave blank to generate from the name.">
                 <input
                   value={form.slug}
                   onChange={(e) => set({ slug: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
                   placeholder={slugify(form.name) || "sundarban-raw-wild-honey"}
                 />
               </Field>
-              <Field label="Category" hint="Drives storefront navigation and filters.">
+              <Field label="Organic Category" hint="Drives storefront navigation & filters.">
                 <select
                   value={form.categorySlug}
                   onChange={(e) => set({ categorySlug: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
                 >
                   <option value="">Select a category…</option>
                   {categories.map((c) => (
@@ -156,23 +153,22 @@ export function ProductForm({
                   ))}
                 </select>
               </Field>
-              <Field label="SKU" hint="Your internal stock reference.">
+              <Field label="SKU / Item Code" hint="Your internal stock reference.">
                 <input
                   value={form.sku}
                   onChange={(e) => set({ sku: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
+                  placeholder="HNY-SND-01"
                 />
               </Field>
               <div className="md:col-span-2">
-                <Field
-                  label="Short description"
-                  hint="One or two lines used on cards and previews."
-                >
+                <Field label="Short Description" hint="Used on product cards & order summary.">
                   <textarea
                     rows={3}
                     value={form.shortDescription}
                     onChange={(e) => set({ shortDescription: e.target.value })}
-                    className="a-input"
+                    className="a-input mt-1"
+                    placeholder="100% Pure, unrefined raw forest honey direct from Sundarban."
                   />
                 </Field>
               </div>
@@ -181,16 +177,16 @@ export function ProductForm({
 
           {tab === "Pricing" && (
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Regular price (৳)">
+              <Field label="Regular Price (৳)">
                 <input
                   type="number"
                   min={0}
                   value={form.regularPrice}
                   onChange={(e) => set({ regularPrice: Number(e.target.value) })}
-                  className="a-input"
+                  className="a-input mt-1"
                 />
               </Field>
-              <Field label="Sale price (৳)" hint="Leave empty for no discount.">
+              <Field label="Offer / Discount Price (৳)" hint="Leave empty if no discount.">
                 <input
                   type="number"
                   min={0}
@@ -198,27 +194,27 @@ export function ProductForm({
                   onChange={(e) =>
                     set({ salePrice: e.target.value ? Number(e.target.value) : null })
                   }
-                  className="a-input"
+                  className="a-input mt-1"
                 />
               </Field>
-              <div className="a-card p-3 md:col-span-2">
-                <p className="text-xs text-muted-foreground">Customer sees</p>
-                <p className="mt-1 text-sm">
+              <div className="a-card p-4 md:col-span-2 bg-secondary/30 rounded-xl border border-border">
+                <p className="text-xs text-muted-foreground font-medium">Customer Price Preview</p>
+                <p className="mt-1 text-base font-semibold">
                   {form.salePrice && form.salePrice < form.regularPrice ? (
                     <>
-                      <span className="font-medium">{formatBDT(form.salePrice)}</span>{" "}
-                      <span className="text-muted-foreground line-through">
+                      <span className="text-primary">{formatBDT(form.salePrice)}</span>{" "}
+                      <span className="text-muted-foreground line-through text-sm">
                         {formatBDT(form.regularPrice)}
                       </span>{" "}
-                      <span className="a-badge a-badge-accent ml-1">
+                      <span className="a-badge a-badge-accent ml-2 bg-accent text-accent-foreground">
                         {Math.round(
                           ((form.regularPrice - form.salePrice) / form.regularPrice) * 100,
                         ) || 0}
-                        % off
+                        % OFF
                       </span>
                     </>
                   ) : (
-                    <span className="font-medium">{formatBDT(form.regularPrice)}</span>
+                    <span className="text-primary">{formatBDT(form.regularPrice)}</span>
                   )}
                 </p>
               </div>
@@ -227,22 +223,25 @@ export function ProductForm({
 
           {tab === "Images" && (
             <Field
-              label="Product images"
-              hint="Drag a tile to reorder. The first image is the cover. Uploaded to Cloudinary and compressed automatically."
+              label="Product Gallery Images"
+              hint="Upload high quality product photos. First image is used as thumbnail."
             >
-              <ImageGalleryUploader
-                urls={form.images}
-                publicIds={form.imagePublicIds ?? []}
-                onChange={(urls, publicIds) => set({ images: urls, imagePublicIds: publicIds })}
-              />
+              <div className="mt-2">
+                <ImageGalleryUploader
+                  urls={form.images}
+                  publicIds={form.imagePublicIds ?? []}
+                  onChange={(urls, publicIds) => set({ images: urls, imagePublicIds: publicIds })}
+                />
+              </div>
             </Field>
           )}
 
-          {tab === "Sizes & Weights" && (
-            <div className="space-y-6">
+          {tab === "Pack Sizes" && (
+            <div className="space-y-4">
               <div>
-                <p className="a-label">
-                  Sizes / Weights / Quantities (e.g. 500g, 1kg, 2kg, 1 Dozen)
+                <p className="a-label">Available Weights & Pack Sizes</p>
+                <p className="a-hint mb-3">
+                  Select available weight packages for this item (e.g. 500g, 1kg, 1 Liter).
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {sizeOptions.map((size) => {
@@ -252,14 +251,14 @@ export function ProductForm({
                         key={size}
                         type="button"
                         onClick={() => toggleSize(size)}
-                        className={`a-btn ${on ? "a-btn-primary" : "a-btn-outline"} min-w-[3rem]`}
+                        className={`a-btn ${on ? "a-btn-primary bg-primary text-primary-foreground font-medium" : "a-btn-outline"} min-w-[3.5rem]`}
                       >
                         {size}
                       </button>
                     );
                   })}
                 </div>
-                <div className="mt-3 flex gap-2">
+                <div className="mt-4 flex gap-2">
                   <input
                     value={customSize}
                     onChange={(e) => setCustomSize(e.target.value)}
@@ -269,47 +268,54 @@ export function ProductForm({
                         addCustomSize();
                       }
                     }}
-                    placeholder="Add custom size/weight, e.g. 500g, 1kg"
+                    placeholder="Custom pack size, e.g. 250ml or 1 Dozen"
                     className="a-input max-w-xs"
                   />
                   <button type="button" onClick={addCustomSize} className="a-btn a-btn-outline">
-                    Add size
+                    Add Size
                   </button>
                 </div>
-                <p className="a-hint">Selected: {form.sizes.join(", ") || "none"}</p>
+                <p className="a-hint mt-2">
+                  Selected:{" "}
+                  <strong className="text-foreground">{form.sizes.join(", ") || "None"}</strong>
+                </p>
               </div>
             </div>
           )}
 
           {tab === "Inventory" && (
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Stock quantity" hint="Reduced automatically when an order is placed.">
+              <Field label="Stock Quantity (Items/Kg)" hint="Stock decreases on user order.">
                 <input
                   type="number"
                   min={0}
                   value={form.stock}
                   onChange={(e) => set({ stock: Number(e.target.value) })}
-                  className="a-input"
+                  className="a-input mt-1"
                 />
               </Field>
-              <Field label="Sort order" hint="Lower numbers appear first in listings.">
+              <Field label="Sort Priority" hint="Lower number appears first on homepage.">
                 <input
                   type="number"
                   value={form.sortOrder}
                   onChange={(e) => set({ sortOrder: Number(e.target.value) })}
-                  className="a-input"
+                  className="a-input mt-1"
                 />
               </Field>
             </div>
           )}
 
           {tab === "Details" && (
-            <Field label="Full description" hint="Fabric, fit, care instructions.">
+            <Field
+              label="Full Description & Organic Purity Notes"
+              hint="Detail ingredients, source, nutritional benefits, harvest process & storage guidelines."
+            >
               <textarea
-                rows={10}
+                rows={9}
                 value={form.fullDescription}
                 onChange={(e) => set({ fullDescription: e.target.value })}
-                className="a-input"
+                className="a-input mt-1"
+                placeholder="100% natural and pesticide-free. Processed naturally without heat..."
               />
             </Field>
           )}
@@ -317,26 +323,26 @@ export function ProductForm({
           {tab === "Visibility" && (
             <div className="grid gap-3 md:grid-cols-2">
               <ToggleRow
-                label="Active"
-                hint="Visible on the storefront."
+                label="Active Status"
+                hint="Visible to customers on website."
                 checked={form.active}
                 onChange={(v) => set({ active: v })}
               />
               <ToggleRow
-                label="Featured"
-                hint="Shown in the featured homepage row."
+                label="Featured Product"
+                hint="Highlight on home page featured list."
                 checked={form.featured}
                 onChange={(v) => set({ featured: v })}
               />
               <ToggleRow
-                label="Best seller"
-                hint="Adds a best-seller placement."
+                label="Best Seller Badge"
+                hint="Display Best Seller tag."
                 checked={form.bestSeller}
                 onChange={(v) => set({ bestSeller: v })}
               />
               <ToggleRow
-                label="New arrival"
-                hint="Adds a new-arrival placement."
+                label="New Harvest / Arrival"
+                hint="Display New Harvest badge."
                 checked={form.newArrival}
                 onChange={(v) => set({ newArrival: v })}
               />
@@ -345,40 +351,37 @@ export function ProductForm({
 
           {tab === "SEO" && (
             <div className="space-y-4">
-              <Field label="URL slug" hint="Used as the product page address.">
+              <Field label="URL Slug" hint="Used in address bar.">
                 <input
                   value={form.slug}
                   onChange={(e) => set({ slug: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
                   placeholder={slugify(form.name)}
                 />
               </Field>
-              <Field
-                label="Meta description"
-                hint={`${form.shortDescription.length}/160 characters — this is the short description shown in search results.`}
-              >
+              <Field label="Meta Description" hint="Snippet shown in search result previews.">
                 <textarea
                   rows={3}
                   value={form.shortDescription}
                   onChange={(e) => set({ shortDescription: e.target.value })}
-                  className="a-input"
+                  className="a-input mt-1"
                 />
               </Field>
-              <div className="a-card p-3">
-                <p className="text-xs text-muted-foreground">Search preview</p>
-                <p className="mt-2 truncate text-sm text-[color:var(--admin-info)]">
-                  {form.name || "Product name"} — Trikon Clothing
+              <div className="a-card p-4 bg-secondary/30 rounded-xl border border-border">
+                <p className="text-xs text-muted-foreground font-medium">Google Search Preview</p>
+                <p className="mt-1 truncate text-sm font-semibold text-primary">
+                  {form.name || "Product Name"} — PureBengal Organic
                 </p>
                 <p className="text-xs text-muted-foreground">/product/{previewSlug || "slug"}</p>
-                <p className="mt-1 line-clamp-2 text-xs">
-                  {form.shortDescription || "Add a short description to control this snippet."}
+                <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                  {form.shortDescription || "Pure Organic food products from Bangladesh."}
                 </p>
               </div>
             </div>
           )}
         </form>
 
-        <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-card px-4 py-3">
+        <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border bg-card px-5 py-4">
           <button type="button" onClick={onCancel} className="a-btn a-btn-outline">
             Cancel
           </button>
@@ -388,16 +391,16 @@ export function ProductForm({
             onClick={() => onSubmit({ ...form, active: false }, true)}
             className="a-btn a-btn-outline"
           >
-            Save as draft
+            Save as Draft
           </button>
           <button
             type="submit"
             form="product-form"
             disabled={saving}
-            className="a-btn a-btn-primary"
+            className="a-btn a-btn-primary bg-primary text-primary-foreground font-medium"
           >
             {saving && <Spinner />}
-            {editing ? "Save changes" : "Create product"}
+            {editing ? "Save Changes" : "Create Product"}
           </button>
         </footer>
       </div>

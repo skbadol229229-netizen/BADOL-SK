@@ -476,32 +476,32 @@
  * ========================================================================= */
 
 .admin-theme {
-  /* Warm cream surfaces — no pure white anywhere. */
-  --background: oklch(0.955 0.012 88);
-  --foreground: oklch(0.18 0.004 80);
-  --card: oklch(0.984 0.008 90);
-  --card-foreground: oklch(0.18 0.004 80);
-  --popover: oklch(0.984 0.008 90);
-  --popover-foreground: oklch(0.18 0.004 80);
-  --primary: oklch(0.19 0.006 80);
-  --primary-foreground: oklch(0.984 0.008 90);
-  --secondary: oklch(0.935 0.014 88);
-  --secondary-foreground: oklch(0.18 0.004 80);
-  --muted: oklch(0.935 0.014 88);
-  --muted-foreground: oklch(0.5 0.012 80);
-  --accent: oklch(0.925 0.02 84);
-  --accent-foreground: oklch(0.18 0.004 80);
-  --sand: oklch(0.67 0.06 75);
-  --sand-foreground: oklch(0.99 0.006 90);
-  --border: oklch(0.882 0.016 86);
-  --input: oklch(0.882 0.016 86);
-  --ring: oklch(0.67 0.06 75);
+  /* PureBengal Organic Green surfaces */
+  --background: #f4f7f3;
+  --foreground: #0d1e11;
+  --card: #ffffff;
+  --card-foreground: #0d1e11;
+  --popover: #ffffff;
+  --popover-foreground: #0d1e11;
+  --primary: #0b2e13;
+  --primary-foreground: #ffffff;
+  --secondary: #e8ede5;
+  --secondary-foreground: #0b2e13;
+  --muted: #ebf0e8;
+  --muted-foreground: #4a634e;
+  --accent: #7cb342;
+  --accent-foreground: #ffffff;
+  --sand: #e8ede4;
+  --sand-foreground: #0b2e13;
+  --border: #d5e0d3;
+  --input: #d5e0d3;
+  --ring: #7cb342;
   --destructive: oklch(0.58 0.21 27);
   --destructive-foreground: oklch(0.99 0.006 90);
-  --success: oklch(0.52 0.13 150);
-  --success-foreground: oklch(0.99 0.006 90);
+  --success: #689f38;
+  --success-foreground: #ffffff;
 
-  --admin-accent: oklch(0.67 0.06 75);
+  --admin-accent: #7cb342;
   --admin-warning: oklch(0.65 0.15 62);
   --admin-info: oklch(0.55 0.21 262);
   --admin-purple: oklch(0.53 0.25 293);
@@ -532,10 +532,10 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
-  --admin-tint: oklch(0.984 0.008 90);
-  --admin-tint-ink: oklch(0.2 0.01 80);
-  --admin-shadow: 0 1px 2px oklch(0.28 0.03 80 / 7%), 0 1px 3px oklch(0.28 0.03 80 / 5%);
-  --admin-shadow-md: 0 2px 6px oklch(0.28 0.03 80 / 8%), 0 8px 24px oklch(0.28 0.03 80 / 6%);
+  --admin-tint: #ffffff;
+  --admin-tint-ink: #0d1e11;
+  --admin-shadow: 0 1px 3px rgba(11, 46, 19, 0.08), 0 1px 2px rgba(11, 46, 19, 0.04);
+  --admin-shadow-md: 0 4px 12px rgba(11, 46, 19, 0.1), 0 12px 28px rgba(11, 46, 19, 0.08);
 
   background-color: var(--color-background);
   color: var(--color-foreground);
