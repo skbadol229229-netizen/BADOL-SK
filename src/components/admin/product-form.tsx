@@ -131,7 +131,7 @@ export function ProductForm({
                   value={form.name}
                   onChange={(e) => set({ name: e.target.value })}
                   className="a-input"
-                  placeholder="Oxford Cotton Shirt"
+                  placeholder="Sundarban Raw Wild Honey"
                 />
               </Field>
               <Field label="URL slug" hint="Leave blank to generate from the name.">
@@ -139,7 +139,7 @@ export function ProductForm({
                   value={form.slug}
                   onChange={(e) => set({ slug: e.target.value })}
                   className="a-input"
-                  placeholder={slugify(form.name) || "oxford-cotton-shirt"}
+                  placeholder={slugify(form.name) || "sundarban-raw-wild-honey"}
                 />
               </Field>
               <Field label="Category" hint="Drives storefront navigation and filters.">

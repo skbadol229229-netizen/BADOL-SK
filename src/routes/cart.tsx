@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
+import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
 import { Container, EmptyState, PageHeading } from "@/components/ui-states";
 import { lineKey, useCart } from "@/context/cart";
 import { formatBDT } from "@/lib/format";
 import { useSettings } from "@/hooks/use-store";
+import { useLanguage } from "@/context/language";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -23,20 +24,27 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const storeSettings = useSettings();
+  const { lang } = useLanguage();
   const { lines, subtotal, hydrated, updateQuantity, removeLine } = useCart();
 
   return (
-    <Container className="py-10 md:py-16">
-      <PageHeading eyebrow="Cart" title="Your bag" />
+    <Container className="py-8 md:py-14">
+      <PageHeading
+        eyebrow={lang === "bn" ? "কার্ট" : "Cart"}
+        title={lang === "bn" ? "আপনার শপিং ব্যাগ" : "Your Shopping Bag"}
+      />
 
       {!hydrated && (
-        <div className="mt-10 space-y-4">
+        <div className="mt-8 space-y-4 max-w-4xl">
           {[0, 1].map((i) => (
-            <div key={i} className="flex animate-pulse gap-4">
-              <div className="h-32 w-24 bg-secondary" />
+            <div
+              key={i}
+              className="flex animate-pulse gap-4 rounded-2xl border border-border p-4 bg-card"
+            >
+              <div className="h-20 w-20 rounded-2xl bg-secondary" />
               <div className="flex-1 space-y-3 py-2">
-                <div className="h-3 w-2/3 bg-secondary" />
-                <div className="h-3 w-1/4 bg-secondary" />
+                <div className="h-4 w-2/3 rounded-md bg-secondary" />
+                <div className="h-3 w-1/4 rounded-md bg-secondary" />
               </div>
             </div>
           ))}
@@ -44,13 +52,17 @@ function CartPage() {
       )}
 
       {hydrated && lines.length === 0 && (
-        <div className="mt-10">
+        <div className="mt-10 max-w-xl mx-auto">
           <EmptyState
-            title="Your bag is empty"
-            description="Add a few essentials and check out with cash on delivery."
+            title={lang === "bn" ? "আপনার শপিং ব্যাগ খালি" : "Your bag is empty"}
+            description={
+              lang === "bn"
+                ? "পছন্দের অর্গানিক খাঁটি পণ্য কার্টে যোগ করুন এবং ক্যাশ অন ডেলিভারিতে অর্ডার করুন।"
+                : "Add a few organic essentials to your bag and check out with cash on delivery."
+            }
             action={
-              <Link to="/shop" className="btn btn-solid">
-                Start shopping
+              <Link to="/shop" className="btn btn-solid rounded-xl px-6 py-3 font-bold">
+                {lang === "bn" ? "শপিং শুরু করুন" : "Start Shopping"}
               </Link>
             }
           />
@@ -58,109 +70,170 @@ function CartPage() {
       )}
 
       {hydrated && lines.length > 0 && (
-        <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-16">
-          <ul className="divide-y divide-border border-y border-border">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px]">
+          {/* Cart Items List */}
+          <div className="space-y-4">
             {lines.map((line) => {
               const key = lineKey(line);
               return (
-                <li
+                <div
                   key={key}
-                  className="grid grid-cols-[80px_minmax(0,1fr)] gap-4 py-5 md:grid-cols-[96px_minmax(0,1fr)]"
+                  className="group relative flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-xs transition-all hover:border-primary/40 hover:shadow-md"
                 >
-                  <Link to="/product/$slug" params={{ slug: line.slug }} className="shrink-0">
+                  {/* Square Rounded Product Image */}
+                  <Link
+                    to="/product/$slug"
+                    params={{ slug: line.slug }}
+                    className="relative shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 bg-secondary/40 p-1 shadow-xs transition-transform group-hover:scale-105"
+                  >
                     <img
                       src={line.image}
                       alt={line.name}
-                      width={800}
-                      height={1000}
+                      width={120}
+                      height={120}
                       loading="lazy"
-                      className="media-4x5"
+                      className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover"
                     />
                   </Link>
-                  <div className="min-w-0">
+
+                  {/* Product Details */}
+                  <div className="min-w-0 flex-1 w-full">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <Link
                           to="/product/$slug"
                           params={{ slug: line.slug }}
-                          className="clamp-2 block text-sm font-medium"
+                          className="line-clamp-2 text-sm sm:text-base font-bold text-foreground hover:text-primary transition-colors"
                         >
                           {line.name}
                         </Link>
                         {line.size && (
-                          <p className="mt-1 text-xs text-muted-foreground">{line.size}</p>
+                          <span className="mt-1 inline-block rounded-lg bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                            {line.size}
+                          </span>
                         )}
                       </div>
                       <button
                         type="button"
                         aria-label={`Remove ${line.name}`}
                         onClick={() => removeLine(key)}
-                        className="shrink-0 p-1 text-muted-foreground hover:text-destructive"
+                        className="rounded-xl p-2 text-muted-foreground hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/50 transition-colors"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center border border-border">
+
+                    {/* Quantity & Unit Total */}
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/50">
+                      <div className="flex items-center rounded-xl border-2 border-primary/20 bg-secondary/50 p-0.5">
                         <button
                           type="button"
                           aria-label="Decrease quantity"
                           onClick={() => updateQuantity(key, line.quantity - 1)}
                           disabled={line.quantity <= 1}
-                          className="h-11 w-11 disabled:opacity-40"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold transition-colors hover:bg-background disabled:opacity-30"
                         >
                           −
                         </button>
-                        <span className="w-9 text-center text-sm">{line.quantity}</span>
+                        <span className="w-8 text-center text-xs font-bold text-foreground">
+                          {line.quantity}
+                        </span>
                         <button
                           type="button"
                           aria-label="Increase quantity"
                           onClick={() => updateQuantity(key, line.quantity + 1)}
                           disabled={line.quantity >= line.maxQuantity}
-                          className="h-11 w-11 disabled:opacity-40"
+                          className="flex h-8 w-8 items-center justify-center rounded-lg text-sm font-extrabold transition-colors hover:bg-background disabled:opacity-30"
                         >
                           +
                         </button>
                       </div>
-                      <span className="whitespace-nowrap text-sm font-medium">
-                        {formatBDT(line.unitPrice * line.quantity)}
-                      </span>
+
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground block">
+                          {formatBDT(line.unitPrice)} × {line.quantity}
+                        </span>
+                        <span className="text-sm sm:text-base font-extrabold text-primary">
+                          {formatBDT(line.unitPrice * line.quantity)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
 
-          <aside className="h-fit border border-border bg-secondary p-5 md:p-6">
-            <h2 className="type-h3">Order summary</h2>
-            <dl className="mt-5 space-y-3 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotal</dt>
-                <dd>{formatBDT(subtotal)}</dd>
+          {/* Order Summary Sidebar */}
+          <aside className="h-fit rounded-3xl border-2 border-primary/20 bg-card p-5 sm:p-6 shadow-lg space-y-5">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <ShoppingBag className="h-5 w-5 text-primary" />
+              <h2 className="text-base font-extrabold text-foreground">
+                {lang === "bn" ? "অর্ডার সারাংশ" : "Order Summary"}
+              </h2>
+            </div>
+
+            <dl className="space-y-3 text-sm">
+              <div className="flex justify-between font-semibold">
+                <dt className="text-muted-foreground">
+                  {lang === "bn" ? "পণ্যগুলোর মোট মূল্য:" : "Subtotal:"}
+                </dt>
+                <dd className="font-extrabold text-foreground">{formatBDT(subtotal)}</dd>
               </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Delivery</dt>
-                <dd className="text-right text-muted-foreground">
-                  {formatBDT(storeSettings.deliveryInsideDhaka)} inside Dhaka
+
+              <div className="flex justify-between border-t border-border/60 pt-3">
+                <dt className="text-muted-foreground text-xs">
+                  {lang === "bn" ? "ডেলিভারি চার্জ:" : "Delivery Fee:"}
+                </dt>
+                <dd className="text-right text-xs font-medium text-muted-foreground">
+                  ঢাকা ভেতরে: {formatBDT(storeSettings.deliveryInsideDhaka)}
                   <br />
-                  {formatBDT(storeSettings.deliveryOutsideDhaka)} outside
+                  ঢাকার বাইরে: {formatBDT(storeSettings.deliveryOutsideDhaka)}
                 </dd>
               </div>
-              <div className="flex justify-between border-t border-border pt-3 text-base font-medium">
-                <dt>Estimated total</dt>
-                <dd>{formatBDT(subtotal + storeSettings.deliveryInsideDhaka)}</dd>
+
+              <div className="flex justify-between border-t border-border pt-3 text-base font-extrabold text-primary">
+                <dt>{lang === "bn" ? "সর্বমোট (আনুমানিক):" : "Estimated Total:"}</dt>
+                <dd className="text-lg">
+                  {formatBDT(subtotal + storeSettings.deliveryInsideDhaka)}
+                </dd>
               </div>
             </dl>
-            <Link to="/checkout" className="btn btn-solid btn-block mt-6">
-              Proceed to checkout
-            </Link>
-            <Link to="/shop" className="btn btn-outline btn-block mt-3">
-              Continue shopping
-            </Link>
-            <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-              Final delivery charge is confirmed at checkout once you choose your district.
-            </p>
+
+            <div className="space-y-2.5 pt-2">
+              <Link
+                to="/checkout"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-extrabold text-white shadow-lg transition-all hover:bg-primary/90 active:scale-95"
+              >
+                <span>{lang === "bn" ? "অর্ডার সম্পন্ন করুন" : "Proceed to Checkout"}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/shop"
+                className="flex w-full items-center justify-center rounded-2xl border border-border bg-secondary/50 px-5 py-2.5 text-xs font-bold text-foreground transition-all hover:bg-secondary"
+              >
+                {lang === "bn" ? "আরও কেনাকাটা করুন" : "Continue Shopping"}
+              </Link>
+            </div>
+
+            <div className="space-y-2 pt-3 border-t border-border/50 text-[11px] text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+                <span>
+                  {lang === "bn"
+                    ? "১০০% খাঁটি ও সেরা মানের নিশ্চয়তা"
+                    : "100% Authentic Organic Guarantee"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Truck className="h-4 w-4 text-primary shrink-0" />
+                <span>
+                  {lang === "bn"
+                    ? "সারাদেশে ক্যাশ অন ডেলিভারি"
+                    : "Nationwide Cash on Delivery Available"}
+                </span>
+              </div>
+            </div>
           </aside>
         </div>
       )}

@@ -15,13 +15,13 @@ export const Route = createFileRoute("/search")({
   }),
   head: () => ({
     meta: [
-      { title: "Search Products — Trikon Clothing" },
+      { title: "পণ্য খুঁজুন — PureBengal Organic" },
       {
         name: "description",
-        content: "Search Trikon menswear by product name, category or SKU.",
+        content: "Search PureBengal 100% organic products by name or category.",
       },
-      { property: "og:title", content: "Search Products — Trikon Clothing" },
-      { property: "og:description", content: "Find the Trikon piece you're looking for." },
+      { property: "og:title", content: "Search Products — PureBengal Organic" },
+      { property: "og:description", content: "Find organic Bangladeshi produce and essentials." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -66,7 +66,7 @@ function SearchPage() {
           value={term}
           onChange={(e) => setTerm(e.target.value)}
           autoComplete="off"
-          placeholder="Try “tee”, “oxford” or “boxer”"
+          placeholder="খুঁজুন “টমেটো”, “মধু”, “ঘি”, “চাল”..."
           className="h-12 min-w-0 flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground"
         />
         {term && (
