@@ -2,6 +2,7 @@
  * Storefront data-access layer, backed by Turso (libSQL).
  */
 import { queryRow, queryRows } from "@/lib/turso";
+import { ensureDbSchema } from "@/lib/db-schema";
 import {
   defaultBanner,
   defaultBanners,
@@ -141,6 +142,7 @@ export function mapSettings(row: Row | null): StoreSettings {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
+  await ensureDbSchema();
   try {
     const rows = await queryRows(
       "SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC",
@@ -155,6 +157,7 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 export async function fetchCategory(slug: string): Promise<Category | null> {
+  await ensureDbSchema();
   try {
     const row = await queryRow("SELECT * FROM categories WHERE slug = ? AND active = 1", [slug]);
     if (!row) return defaultCategories.find((c) => c.slug === slug) ?? null;
@@ -165,6 +168,7 @@ export async function fetchCategory(slug: string): Promise<Category | null> {
 }
 
 export async function fetchBanners(): Promise<Banner[]> {
+  await ensureDbSchema();
   try {
     const rows = await queryRows("SELECT * FROM banners WHERE active = 1 ORDER BY sort_order ASC");
     if (!rows || rows.length === 0) return defaultBanners;
@@ -175,6 +179,7 @@ export async function fetchBanners(): Promise<Banner[]> {
 }
 
 export async function fetchSettings(): Promise<StoreSettings> {
+  await ensureDbSchema();
   let settings = defaultSettings;
   try {
     const row = await queryRow("SELECT * FROM store_settings LIMIT 1");
@@ -200,6 +205,7 @@ export async function fetchSettings(): Promise<StoreSettings> {
 }
 
 async function fetchActiveProducts(): Promise<Product[]> {
+  await ensureDbSchema();
   let deletedIds = new Set<string>();
   if (typeof window !== "undefined") {
     try {
@@ -214,12 +220,12 @@ async function fetchActiveProducts(): Promise<Product[]> {
 
   try {
     const rows = await queryRows("SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC");
-    if (rows) {
+    if (rows && rows.length > 0) {
       return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
     }
-    return [];
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   } catch {
-    return [];
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   }
 }
 
@@ -298,6 +304,7 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
 }
 
 export async function fetchProduct(slug: string): Promise<Product | null> {
+  await ensureDbSchema();
   let deletedIds = new Set<string>();
   if (typeof window !== "undefined") {
     try {
@@ -312,13 +319,17 @@ export async function fetchProduct(slug: string): Promise<Product | null> {
 
   try {
     const row = await queryRow("SELECT * FROM products WHERE slug = ? AND active = 1", [slug]);
-    if (!row) return null;
-    const prod = mapProduct(row);
-    if (deletedIds.has(prod.id)) return null;
-    return prod;
+    if (row) {
+      const prod = mapProduct(row);
+      if (!deletedIds.has(prod.id)) return prod;
+    }
   } catch {
-    return null;
+    /* fallback */
   }
+
+  const def = defaultProducts.find((p) => p.slug === slug);
+  if (def && !deletedIds.has(def.id)) return def;
+  return null;
 }
 
 export async function fetchRelated(product: Product): Promise<Product[]> {

@@ -1,4 +1,5 @@
 import { execBatch, execSql, isTursoConfigured, queryRow, queryRows } from "@/lib/turso";
+import { ensureDbSchema } from "@/lib/db-schema";
 import {
   defaultBanner,
   defaultBanners,
@@ -23,6 +24,7 @@ const ADMIN_SESSION_KEY = "dhaka_admin_session_v1";
 /* ---------------------------------- auth --------------------------------- */
 
 export async function signInAdmin(email: string, password: string): Promise<void> {
+  await ensureDbSchema();
   const cleanEmail = email.trim().toLowerCase();
   const DEFAULT_EMAIL = "skbadol229229@gmail.com";
   const DEFAULT_PASS = "01965566396";
@@ -294,6 +296,7 @@ export async function fetchLowStock(threshold = 5): Promise<LowStockRow[]> {
 export type ProductInput = Omit<Product, "id" | "createdAt">;
 
 export async function adminListProducts(): Promise<Product[]> {
+  await ensureDbSchema();
   let deletedIds = new Set<string>();
   if (typeof window !== "undefined") {
     try {
@@ -308,48 +311,51 @@ export async function adminListProducts(): Promise<Product[]> {
 
   try {
     const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
-    if (rows) {
+    if (rows && rows.length > 0) {
       return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
     }
-    return [];
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   } catch {
-    return [];
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   }
 }
 
 export async function adminCreateProduct(input: ProductInput): Promise<void> {
+  await ensureDbSchema();
   const id = "p_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   await execSql(
     `INSERT INTO products (
       id, name, slug, short_description, full_description, category_slug,
       images, image_public_ids, regular_price, sale_price, sizes, colors,
-      stock, sku, featured, best_seller, new_arrival, active, sort_order
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      stock, sku, featured, best_seller, new_arrival, active, sort_order, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
-      input.name,
-      input.slug,
-      input.shortDescription,
-      input.fullDescription,
-      input.categorySlug,
+      input.name || "",
+      input.slug || "",
+      input.shortDescription || "",
+      input.fullDescription || "",
+      input.categorySlug || "",
       JSON.stringify(input.images || []),
       JSON.stringify(input.imagePublicIds || []),
-      input.regularPrice,
-      input.salePrice,
+      input.regularPrice || 0,
+      input.salePrice ?? null,
       JSON.stringify(input.sizes || []),
       JSON.stringify(input.colors || []),
-      input.stock,
-      input.sku,
+      input.stock || 0,
+      input.sku || "",
       input.featured ? 1 : 0,
       input.bestSeller ? 1 : 0,
       input.newArrival ? 1 : 0,
       input.active ? 1 : 0,
-      input.sortOrder,
+      input.sortOrder || 0,
+      new Date().toISOString(),
     ],
   );
 }
 
 export async function adminUpdateProduct(id: string, input: ProductInput): Promise<void> {
+  await ensureDbSchema();
   await execSql(
     `UPDATE products SET
       name = ?, slug = ?, short_description = ?, full_description = ?, category_slug = ?,
@@ -357,34 +363,36 @@ export async function adminUpdateProduct(id: string, input: ProductInput): Promi
       stock = ?, sku = ?, featured = ?, best_seller = ?, new_arrival = ?, active = ?, sort_order = ?
     WHERE id = ?`,
     [
-      input.name,
-      input.slug,
-      input.shortDescription,
-      input.fullDescription,
-      input.categorySlug,
+      input.name || "",
+      input.slug || "",
+      input.shortDescription || "",
+      input.fullDescription || "",
+      input.categorySlug || "",
       JSON.stringify(input.images || []),
       JSON.stringify(input.imagePublicIds || []),
-      input.regularPrice,
-      input.salePrice,
+      input.regularPrice || 0,
+      input.salePrice ?? null,
       JSON.stringify(input.sizes || []),
       JSON.stringify(input.colors || []),
-      input.stock,
-      input.sku,
+      input.stock || 0,
+      input.sku || "",
       input.featured ? 1 : 0,
       input.bestSeller ? 1 : 0,
       input.newArrival ? 1 : 0,
       input.active ? 1 : 0,
-      input.sortOrder,
+      input.sortOrder || 0,
       id,
     ],
   );
 }
 
 export async function adminSetProductActive(id: string, active: boolean): Promise<void> {
+  await ensureDbSchema();
   await execSql("UPDATE products SET active = ? WHERE id = ?", [active ? 1 : 0, id]);
 }
 
 export async function adminDeleteProduct(id: string): Promise<void> {
+  await ensureDbSchema();
   if (typeof window !== "undefined") {
     try {
       const stored = window.localStorage.getItem("purebengal_deleted_products");
