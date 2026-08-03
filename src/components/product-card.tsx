@@ -16,7 +16,7 @@ export function ProductCard({
   product: Product;
   priority?: boolean;
 }) {
-  const { addItem } = useCart();
+  const { addLine } = useCart();
   const { lang, t } = useLanguage();
   const [added, setAdded] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
@@ -34,7 +34,16 @@ export function ProductCard({
     e.stopPropagation();
     if (soldOut) return;
 
-    addItem(product, 1);
+    addLine({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: product.images[0],
+      unitPrice: price,
+      size: weightLabel || "Standard",
+      quantity: 1,
+      maxQuantity: Math.max(1, Math.min(product.stock, 10)),
+    });
     setAdded(true);
     toast.success(`${product.name} - ${t("added")}`);
     setTimeout(() => setAdded(false), 1800);

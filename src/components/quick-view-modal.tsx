@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { X, ShoppingBag, ArrowRight, ShieldCheck, Check, Plus, Minus, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X, ShoppingBag, ShieldCheck, Plus, Minus, Zap, ExternalLink } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import type { Product } from "@/data/types";
@@ -16,7 +17,7 @@ export function QuickViewModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const { addItem } = useCart();
+  const { addLine } = useCart();
   const { lang } = useLanguage();
   const navigate = useNavigate();
 
@@ -25,19 +26,39 @@ export function QuickViewModal({
   const [qty, setQty] = useState(1);
   const [adding, setAdding] = useState(false);
 
+  useEffect(() => {
+    if (product) {
+      setActiveImg(0);
+      setSelectedSize(product.sizes?.[0] ?? null);
+      setQty(1);
+      setAdding(false);
+    }
+  }, [product, isOpen]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   if (!isOpen || !product) return null;
 
   const price = effectivePrice(product.regularPrice, product.salePrice);
   const off = discountPercent(product.regularPrice, product.salePrice);
   const soldOut = product.stock <= 0;
-  const currentSize = selectedSize ?? (product.sizes[0] || "Standard");
+  const currentSize = selectedSize ?? (product.sizes?.[0] || "Standard");
 
   const handleAddToCart = () => {
     if (soldOut) return;
     setAdding(true);
-    addItem({
+    addLine({
       productId: product.id,
-      productSlug: product.slug,
+      slug: product.slug,
       name: product.name,
       image: product.images[activeImg] || product.images[0],
       unitPrice: price,
@@ -53,9 +74,9 @@ export function QuickViewModal({
 
   const handleBuyNow = () => {
     if (soldOut) return;
-    addItem({
+    addLine({
       productId: product.id,
-      productSlug: product.slug,
+      slug: product.slug,
       name: product.name,
       image: product.images[activeImg] || product.images[0],
       unitPrice: price,
@@ -67,27 +88,33 @@ export function QuickViewModal({
     navigate({ to: "/checkout" });
   };
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4">
+  const handleViewDetails = () => {
+    onClose();
+    navigate({ to: "/product/$slug", params: { slug: product.slug } });
+  };
+
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-4 md:p-6">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="absolute inset-0 bg-black/70 backdrop-blur-md transition-opacity animate-in fade-in duration-200"
+        className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
       />
 
       {/* Modal Dialog Card */}
-      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-5 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-5 sm:p-7 shadow-2xl animate-in zoom-in-95 duration-200">
         {/* Close X Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-muted/80 text-foreground transition-all hover:bg-muted hover:scale-110"
+          aria-label="Close modal"
+          className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-muted/80 text-foreground transition-all hover:bg-muted hover:scale-110 shadow-sm"
         >
           <X className="h-5 w-5" />
         </button>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Left Column: Image in Beautiful Shape Frame */}
+          {/* Left Column: Image in Frame */}
           <div className="space-y-3">
             <div className="relative aspect-square w-full overflow-hidden rounded-2xl border-2 border-primary/20 bg-secondary/30 p-2 shadow-inner group">
               {/* Organic Badge Overlay */}
@@ -120,7 +147,7 @@ export function QuickViewModal({
                     className={`h-14 w-14 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
                       activeImg === i
                         ? "border-primary ring-2 ring-primary/20"
-                        : "border-border opacity-70"
+                        : "border-border opacity-70 hover:opacity-100"
                     }`}
                   >
                     <img src={img} alt="" className="h-full w-full object-cover" />
@@ -165,7 +192,7 @@ export function QuickViewModal({
                         onClick={() => setSelectedSize(s)}
                         className={`rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                           currentSize === s
-                            ? "border-primary bg-primary text-white shadow-xs"
+                            ? "border-primary bg-primary text-white shadow-xs scale-105"
                             : "border-border bg-card text-foreground hover:border-primary/50"
                         }`}
                       >
@@ -177,13 +204,23 @@ export function QuickViewModal({
               )}
 
               {/* Description */}
-              <p className="mt-4 text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-4">
-                {product.description}
+              <p className="mt-3 text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                {product.shortDescription || product.description}
               </p>
+
+              {/* View Full Details Link Button */}
+              <button
+                type="button"
+                onClick={handleViewDetails}
+                className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline group"
+              >
+                <span>{lang === "bn" ? "বিস্তারিত বিবরণ দেখুন" : "View Full Details"}</span>
+                <ExternalLink className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </button>
             </div>
 
             {/* Quantity and CTA Buttons */}
-            <div className="space-y-3 pt-2 border-t border-border">
+            <div className="space-y-3 pt-3 border-t border-border">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-foreground">
                   {lang === "bn" ? "পরিমাণ (Qty):" : "Quantity:"}
@@ -192,17 +229,19 @@ export function QuickViewModal({
                   <button
                     type="button"
                     onClick={() => setQty(Math.max(1, qty - 1))}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-card text-foreground hover:bg-muted"
+                    disabled={qty <= 1 || soldOut}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-foreground hover:bg-muted disabled:opacity-40"
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="w-8 text-center text-xs font-extrabold text-foreground">
+                  <span className="w-9 text-center text-xs font-extrabold text-foreground">
                     {qty}
                   </span>
                   <button
                     type="button"
-                    onClick={() => setQty(Math.min(10, qty + 1))}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg bg-card text-foreground hover:bg-muted"
+                    onClick={() => setQty(Math.min(Math.min(product.stock, 10), qty + 1))}
+                    disabled={soldOut || qty >= Math.min(product.stock, 10)}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-card text-foreground hover:bg-muted disabled:opacity-40"
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
@@ -214,7 +253,7 @@ export function QuickViewModal({
                   type="button"
                   disabled={soldOut}
                   onClick={handleAddToCart}
-                  className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-primary bg-primary/10 px-4 py-3 text-xs font-bold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50"
+                  className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-primary bg-primary/10 px-3 py-3 text-xs font-extrabold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50"
                 >
                   <ShoppingBag className="h-4 w-4" />
                   <span>
@@ -226,7 +265,7 @@ export function QuickViewModal({
                   type="button"
                   disabled={soldOut}
                   onClick={handleBuyNow}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white transition-all hover:bg-primary/90 hover:shadow-lg disabled:opacity-50"
+                  className="flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-3 text-xs font-extrabold text-white transition-all hover:bg-primary/90 hover:shadow-lg disabled:opacity-50"
                 >
                   <Zap className="h-4 w-4 fill-current text-amber-300" />
                   <span>{lang === "bn" ? "সরাসরি কিনুন" : "Buy Now"}</span>
@@ -234,11 +273,11 @@ export function QuickViewModal({
               </div>
 
               <div className="flex items-center justify-center gap-2 pt-1 text-[11px] text-muted-foreground font-medium">
-                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
                 <span>
                   {lang === "bn"
                     ? "ক্যাশ অন ডেলিভারি সুবিধা (পণ্য পেয়ে মূল্য দিন)"
-                    : "Cash on Delivery Available Across Bangladesh"}
+                    : "Cash on Delivery Available Nationwide"}
                 </span>
               </div>
             </div>
@@ -247,4 +286,6 @@ export function QuickViewModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
