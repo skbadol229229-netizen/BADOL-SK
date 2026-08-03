@@ -179,10 +179,10 @@ export async function fetchAdminStats(): Promise<AdminStats> {
       deliveredOrders: 0,
       revenue: 0,
       pipelineValue: 0,
-      totalProducts: defaultProducts.length,
-      activeProducts: defaultProducts.filter((p) => p.active).length,
+      totalProducts: 0,
+      activeProducts: 0,
       outOfStock: 0,
-      totalCategories: defaultCategories.length,
+      totalCategories: 0,
       pendingReviews: 0,
       statusCounts: {},
     };
@@ -242,10 +242,10 @@ export async function fetchAdminStats(): Promise<AdminStats> {
       deliveredOrders: 0,
       revenue: 0,
       pipelineValue: 0,
-      totalProducts: defaultProducts.length,
-      activeProducts: defaultProducts.filter((p) => p.active).length,
+      totalProducts: 0,
+      activeProducts: 0,
       outOfStock: 0,
-      totalCategories: defaultCategories.length,
+      totalCategories: 0,
       pendingReviews: 0,
       statusCounts: {},
     };
@@ -308,12 +308,12 @@ export async function adminListProducts(): Promise<Product[]> {
 
   try {
     const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
-    if (rows && rows.length > 0) {
+    if (rows) {
       return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
     }
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
+    return [];
   } catch {
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
+    return [];
   }
 }
 

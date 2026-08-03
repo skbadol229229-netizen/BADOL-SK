@@ -214,12 +214,12 @@ async function fetchActiveProducts(): Promise<Product[]> {
 
   try {
     const rows = await queryRows("SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC");
-    if (rows && rows.length > 0) {
+    if (rows) {
       return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
     }
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
+    return [];
   } catch {
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
+    return [];
   }
 }
 
@@ -298,31 +298,65 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
 }
 
 export async function fetchProduct(slug: string): Promise<Product | null> {
+  let deletedIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_deleted_products");
+      if (stored) {
+        deletedIds = new Set(JSON.parse(stored));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   try {
     const row = await queryRow("SELECT * FROM products WHERE slug = ? AND active = 1", [slug]);
-    if (!row) return defaultProducts.find((p) => p.slug === slug) ?? null;
-    return mapProduct(row);
+    if (!row) return null;
+    const prod = mapProduct(row);
+    if (deletedIds.has(prod.id)) return null;
+    return prod;
   } catch {
-    return defaultProducts.find((p) => p.slug === slug) ?? null;
+    return null;
   }
 }
 
 export async function fetchRelated(product: Product): Promise<Product[]> {
+  let deletedIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_deleted_products");
+      if (stored) {
+        deletedIds = new Set(JSON.parse(stored));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   try {
     const rows = await queryRows(
-      "SELECT * FROM products WHERE active = 1 AND category_slug = ? AND id != ? LIMIT 4",
+      "SELECT * FROM products WHERE active = 1 AND category_slug = ? AND id != ? ORDER BY sort_order ASC LIMIT 4",
       [product.categorySlug, product.id],
     );
-    if (!rows || rows.length === 0) {
-      return defaultProducts
-        .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
-        .slice(0, 4);
+    let list = (rows || []).map(mapProduct).filter((p) => !deletedIds.has(p.id));
+
+    if (list.length < 4) {
+      const existingIds = new Set([product.id, ...list.map((p) => p.id)]);
+      const otherRows = await queryRows(
+        "SELECT * FROM products WHERE active = 1 AND id != ? ORDER BY sort_order ASC LIMIT 12",
+        [product.id],
+      );
+      if (otherRows && otherRows.length > 0) {
+        const others = otherRows
+          .map(mapProduct)
+          .filter((p) => !existingIds.has(p.id) && !deletedIds.has(p.id));
+        list = [...list, ...others.slice(0, 4 - list.length)];
+      }
     }
-    return rows.map(mapProduct);
+    return list;
   } catch {
-    return defaultProducts
-      .filter((p) => p.categorySlug === product.categorySlug && p.id !== product.id)
-      .slice(0, 4);
+    return [];
   }
 }
 
