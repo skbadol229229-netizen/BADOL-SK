@@ -145,11 +145,10 @@ export async function fetchCategories(): Promise<Category[]> {
     const rows = await queryRows(
       "SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC",
     );
-    if (!rows || rows.length === 0) return defaultCategories;
-    const mapped = rows.map(mapCategory);
-    const existingSlugs = new Set(mapped.map((c) => c.slug));
-    const missingDefaults = defaultCategories.filter((c) => !existingSlugs.has(c.slug));
-    return [...mapped, ...missingDefaults];
+    if (rows && rows.length > 0) {
+      return rows.map(mapCategory);
+    }
+    return defaultCategories;
   } catch {
     return defaultCategories;
   }
@@ -201,15 +200,26 @@ export async function fetchSettings(): Promise<StoreSettings> {
 }
 
 async function fetchActiveProducts(): Promise<Product[]> {
+  let deletedIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_deleted_products");
+      if (stored) {
+        deletedIds = new Set(JSON.parse(stored));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   try {
     const rows = await queryRows("SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return defaultProducts;
-    const mapped = rows.map(mapProduct);
-    const existingSlugs = new Set(mapped.map((p) => p.slug));
-    const missingDefaults = defaultProducts.filter((p) => !existingSlugs.has(p.slug));
-    return [...mapped, ...missingDefaults];
+    if (rows && rows.length > 0) {
+      return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
+    }
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   } catch {
-    return defaultProducts;
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   }
 }
 

@@ -294,15 +294,26 @@ export async function fetchLowStock(threshold = 5): Promise<LowStockRow[]> {
 export type ProductInput = Omit<Product, "id" | "createdAt">;
 
 export async function adminListProducts(): Promise<Product[]> {
+  let deletedIds = new Set<string>();
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_deleted_products");
+      if (stored) {
+        deletedIds = new Set(JSON.parse(stored));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   try {
     const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return defaultProducts;
-    const mapped = rows.map(mapProduct);
-    const existingSlugs = new Set(mapped.map((p) => p.slug));
-    const missingDefaults = defaultProducts.filter((p) => !existingSlugs.has(p.slug));
-    return [...mapped, ...missingDefaults];
+    if (rows && rows.length > 0) {
+      return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
+    }
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   } catch {
-    return defaultProducts;
+    return defaultProducts.filter((p) => !deletedIds.has(p.id));
   }
 }
 
@@ -374,7 +385,26 @@ export async function adminSetProductActive(id: string, active: boolean): Promis
 }
 
 export async function adminDeleteProduct(id: string): Promise<void> {
-  await execSql("DELETE FROM products WHERE id = ?", [id]);
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_deleted_products");
+      const deletedIds: string[] = stored ? JSON.parse(stored) : [];
+      if (!deletedIds.includes(id)) {
+        deletedIds.push(id);
+        window.localStorage.setItem("purebengal_deleted_products", JSON.stringify(deletedIds));
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (isTursoConfigured) {
+    try {
+      await execSql("DELETE FROM products WHERE id = ?", [id]);
+    } catch (e) {
+      console.error("Error deleting product from DB:", e);
+    }
+  }
 }
 
 /* -------------------------------- categories ------------------------------ */
@@ -384,11 +414,10 @@ export type CategoryInput = Omit<Category, "id">;
 export async function adminListCategories(): Promise<Category[]> {
   try {
     const rows = await queryRows("SELECT * FROM categories ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return defaultCategories;
-    const mapped = rows.map(mapCategory);
-    const existingSlugs = new Set(mapped.map((c) => c.slug));
-    const missingDefaults = defaultCategories.filter((c) => !existingSlugs.has(c.slug));
-    return [...mapped, ...missingDefaults];
+    if (rows && rows.length > 0) {
+      return rows.map(mapCategory);
+    }
+    return defaultCategories;
   } catch {
     return defaultCategories;
   }
