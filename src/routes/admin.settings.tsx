@@ -246,13 +246,50 @@ function AdminSettingsPage() {
               label="Offer End Time (ISO Date/Time or timestamp)"
               hint="e.g. 2026-08-03T23:59:59"
             >
-              <input
-                type="text"
-                value={form.flashSaleEndTime ?? ""}
-                onChange={(e) => set("flashSaleEndTime", e.target.value)}
-                placeholder="2026-08-03T23:59:59"
-                className="a-input"
-              />
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={form.flashSaleEndTime ?? ""}
+                  onChange={(e) => set("flashSaleEndTime", e.target.value)}
+                  placeholder="2026-08-03T23:59:59"
+                  className="a-input"
+                />
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      set("flashSaleEndTime", new Date(Date.now() + 24 * 3600 * 1000).toISOString())
+                    }
+                    className="rounded-md bg-secondary px-2.5 py-1 font-medium hover:bg-secondary/80"
+                  >
+                    Set +24 Hours
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      set(
+                        "flashSaleEndTime",
+                        new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString(),
+                      )
+                    }
+                    className="rounded-md bg-secondary px-2.5 py-1 font-medium hover:bg-secondary/80"
+                  >
+                    Set +3 Days
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      set(
+                        "flashSaleEndTime",
+                        new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
+                      )
+                    }
+                    className="rounded-md bg-secondary px-2.5 py-1 font-medium hover:bg-secondary/80"
+                  >
+                    Set +7 Days
+                  </button>
+                </div>
+              </div>
             </Field>
           </div>
         </AdminCard>

@@ -310,10 +310,13 @@ export async function fetchReviews(slug: string): Promise<Review[]> {
 
 export async function fetchHomeSections() {
   const list = await fetchActiveProducts();
+  const flashSaleList = list.filter((p) => p.salePrice && p.salePrice < p.regularPrice);
   return {
+    home12: list.slice(0, 12),
+    flashSale: flashSaleList.length > 0 ? flashSaleList.slice(0, 4) : list.slice(0, 4),
     newArrivals: list.filter((p) => p.newArrival).slice(0, 8),
-    bestSellers: list.filter((p) => p.bestSeller).slice(0, 8),
-    featured: list.filter((p) => p.featured).slice(0, 4),
+    bestSellers: list.filter((p) => p.bestSeller).slice(0, 12),
+    featured: list.filter((p) => p.featured).slice(0, 12),
   };
 }
 

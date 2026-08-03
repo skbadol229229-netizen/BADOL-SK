@@ -22,7 +22,7 @@ export function FlashSaleSection() {
     queryFn: fetchHomeSections,
   });
 
-  const flashProducts = homeData?.newArrivals?.slice(0, 4) || [];
+  const flashProducts = homeData?.flashSale || [];
 
   useEffect(() => {
     if (!storeSettings.flashSaleEndTime) return;
@@ -60,17 +60,17 @@ export function FlashSaleSection() {
       <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
 
       {/* Top Header */}
-      <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/10">
-        <div className="space-y-2">
+      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-6 border-b border-white/10">
+        <div className="space-y-2 max-w-2xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 border border-amber-500/30">
             <Flame className="h-4 w-4 animate-bounce text-amber-400" />
             <span>{lang === "bn" ? "স্পেশাল ফ্ল্যাশ ডিল" : "Special Flash Deal"}</span>
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white leading-tight">
             {title}
           </h2>
           <p className="text-xs sm:text-sm text-emerald-200/80 flex items-center gap-1.5">
-            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+            <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
             <span>
               {lang === "bn"
                 ? "১০০% খাঁটি ও তাজা অর্গানিক সামগ্রী সরাসরি ফার্ম থেকে"
@@ -80,7 +80,7 @@ export function FlashSaleSection() {
         </div>
 
         {/* Countdown Timer Display */}
-        <div className="flex items-center gap-2 sm:gap-3 bg-black/40 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-white/10 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 bg-black/40 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-white/10 shrink-0 self-start lg:self-center">
           <div className="flex items-center gap-1 text-amber-400 mr-2">
             <Clock className="h-5 w-5 animate-spin" style={{ animationDuration: "6s" }} />
           </div>

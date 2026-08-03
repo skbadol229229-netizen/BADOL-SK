@@ -120,7 +120,7 @@ function HomePage() {
     <div className="pb-8">
       {/* HERO SECTION SLIDER */}
       <section className="relative px-3 pt-3 sm:px-6 sm:pt-4 max-w-7xl mx-auto">
-        <div className="relative aspect-[16/9] md:aspect-[21/9] min-h-[300px] sm:min-h-[380px] w-full overflow-hidden rounded-[24px] shadow-lg bg-[#0B2E13]">
+        <div className="relative h-[280px] sm:h-[380px] md:h-[460px] lg:h-[500px] w-full overflow-hidden rounded-[24px] shadow-xl bg-[#0B2E13]">
           {banners.map((slide, index) => (
             <div
               key={slide.id || index}
@@ -259,9 +259,9 @@ function HomePage() {
           </Link>
         </div>
 
-        {isPending && <ProductGridSkeleton count={8} />}
+        {isPending && <ProductGridSkeleton count={12} />}
         {isError && <ErrorState onRetry={() => refetch()} />}
-        {data && <ProductGrid products={data.bestSellers} />}
+        {data && <ProductGrid products={data.home12 || data.bestSellers} />}
       </Container>
 
       {/* TRUST SECTION BADGES */}
