@@ -81,6 +81,7 @@ function AdminSettingsPage() {
       toast.success("Settings saved");
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       queryClient.invalidateQueries({ queryKey: ["store-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["home-sections"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });

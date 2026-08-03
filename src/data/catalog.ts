@@ -97,6 +97,16 @@ export const defaultCategories: Category[] = [
     active: true,
     sortOrder: 7,
   },
+  {
+    id: "herbal-and-tea",
+    name: "Herbal & Tea (হর্বাল ও চা)",
+    slug: "herbal-and-tea",
+    description: "Organic Sylhet green tea, Ashwagandha, Moringa, and traditional herbal remedies.",
+    image:
+      "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=800&q=80",
+    active: true,
+    sortOrder: 8,
+  },
 ];
 
 export const defaultBanners: Banner[] = [

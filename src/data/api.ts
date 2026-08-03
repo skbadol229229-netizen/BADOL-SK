@@ -146,7 +146,10 @@ export async function fetchCategories(): Promise<Category[]> {
       "SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC",
     );
     if (!rows || rows.length === 0) return defaultCategories;
-    return rows.map(mapCategory);
+    const mapped = rows.map(mapCategory);
+    const existingSlugs = new Set(mapped.map((c) => c.slug));
+    const missingDefaults = defaultCategories.filter((c) => !existingSlugs.has(c.slug));
+    return [...mapped, ...missingDefaults];
   } catch {
     return defaultCategories;
   }
@@ -173,20 +176,38 @@ export async function fetchBanners(): Promise<Banner[]> {
 }
 
 export async function fetchSettings(): Promise<StoreSettings> {
+  let settings = defaultSettings;
   try {
     const row = await queryRow("SELECT * FROM store_settings LIMIT 1");
-    if (!row) return defaultSettings;
-    return mapSettings(row);
+    if (row) {
+      settings = mapSettings(row);
+    }
   } catch {
-    return defaultSettings;
+    /* fallback to default */
   }
+
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_store_settings");
+      if (stored) {
+        settings = { ...settings, ...JSON.parse(stored) };
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return settings;
 }
 
 async function fetchActiveProducts(): Promise<Product[]> {
   try {
     const rows = await queryRows("SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC");
     if (!rows || rows.length === 0) return defaultProducts;
-    return rows.map(mapProduct);
+    const mapped = rows.map(mapProduct);
+    const existingSlugs = new Set(mapped.map((p) => p.slug));
+    const missingDefaults = defaultProducts.filter((p) => !existingSlugs.has(p.slug));
+    return [...mapped, ...missingDefaults];
   } catch {
     return defaultProducts;
   }

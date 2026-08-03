@@ -297,7 +297,10 @@ export async function adminListProducts(): Promise<Product[]> {
   try {
     const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
     if (!rows || rows.length === 0) return defaultProducts;
-    return rows.map(mapProduct);
+    const mapped = rows.map(mapProduct);
+    const existingSlugs = new Set(mapped.map((p) => p.slug));
+    const missingDefaults = defaultProducts.filter((p) => !existingSlugs.has(p.slug));
+    return [...mapped, ...missingDefaults];
   } catch {
     return defaultProducts;
   }
@@ -382,7 +385,10 @@ export async function adminListCategories(): Promise<Category[]> {
   try {
     const rows = await queryRows("SELECT * FROM categories ORDER BY sort_order ASC");
     if (!rows || rows.length === 0) return defaultCategories;
-    return rows.map(mapCategory);
+    const mapped = rows.map(mapCategory);
+    const existingSlugs = new Set(mapped.map((c) => c.slug));
+    const missingDefaults = defaultCategories.filter((c) => !existingSlugs.has(c.slug));
+    return [...mapped, ...missingDefaults];
   } catch {
     return defaultCategories;
   }
@@ -602,61 +608,147 @@ export async function adminUpdateOrderStatus(id: string, status: OrderStatus): P
 /* --------------------------------- settings ------------------------------- */
 
 export async function adminFetchSettings(): Promise<StoreSettings> {
+  let settings = defaultSettings;
   try {
     const row = await queryRow("SELECT * FROM store_settings LIMIT 1");
-    if (!row) return defaultSettings;
-    return mapSettings(row);
+    if (row) {
+      settings = mapSettings(row);
+    }
   } catch {
-    return defaultSettings;
+    /* fallback */
   }
+
+  if (typeof window !== "undefined") {
+    try {
+      const stored = window.localStorage.getItem("purebengal_store_settings");
+      if (stored) {
+        settings = { ...settings, ...JSON.parse(stored) };
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return settings;
 }
 
 export async function adminUpdateSettings(input: StoreSettings): Promise<void> {
-  await execSql(
-    `INSERT INTO store_settings (
-      id, store_name, logo_url, logo_public_id, announcement, support_phone, whatsapp,
-      support_email, address, facebook_url, instagram_url, youtube_url,
-      delivery_inside_dhaka, delivery_outside_dhaka, delivery_time_inside,
-      delivery_time_outside, exchange_window_days, cod_enabled
-    ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(id) DO UPDATE SET
-      store_name=excluded.store_name,
-      logo_url=excluded.logo_url,
-      logo_public_id=excluded.logo_public_id,
-      announcement=excluded.announcement,
-      support_phone=excluded.support_phone,
-      whatsapp=excluded.whatsapp,
-      support_email=excluded.support_email,
-      address=excluded.address,
-      facebook_url=excluded.facebook_url,
-      instagram_url=excluded.instagram_url,
-      youtube_url=excluded.youtube_url,
-      delivery_inside_dhaka=excluded.delivery_inside_dhaka,
-      delivery_outside_dhaka=excluded.delivery_outside_dhaka,
-      delivery_time_inside=excluded.delivery_time_inside,
-      delivery_time_outside=excluded.delivery_time_outside,
-      exchange_window_days=excluded.exchange_window_days,
-      cod_enabled=excluded.cod_enabled`,
-    [
-      input.storeName,
-      input.logoUrl || "",
-      input.logoPublicId || "",
-      input.announcement,
-      input.supportPhone,
-      input.whatsapp,
-      input.supportEmail,
-      input.address,
-      input.facebookUrl,
-      input.instagramUrl,
-      input.youtubeUrl,
-      input.deliveryInsideDhaka,
-      input.deliveryOutsideDhaka,
-      input.deliveryTimeInside,
-      input.deliveryTimeOutside,
-      input.exchangeWindowDays,
-      input.codEnabled ? 1 : 0,
-    ],
-  );
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem("purebengal_store_settings", JSON.stringify(input));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(`
+        CREATE TABLE IF NOT EXISTS store_settings (
+          id INTEGER PRIMARY KEY,
+          store_name TEXT,
+          logo_url TEXT,
+          logo_public_id TEXT,
+          announcement TEXT,
+          support_phone TEXT,
+          whatsapp TEXT,
+          support_email TEXT,
+          address TEXT,
+          facebook_url TEXT,
+          instagram_url TEXT,
+          youtube_url TEXT,
+          delivery_inside_dhaka REAL,
+          delivery_outside_dhaka REAL,
+          delivery_time_inside TEXT,
+          delivery_time_outside TEXT,
+          exchange_window_days INTEGER,
+          cod_enabled INTEGER,
+          flash_sale_enabled INTEGER,
+          flash_sale_title_bn TEXT,
+          flash_sale_title_en TEXT,
+          flash_sale_end_time TEXT
+        );
+      `);
+
+      try {
+        await execSql("ALTER TABLE store_settings ADD COLUMN flash_sale_enabled INTEGER DEFAULT 1");
+      } catch {
+        /* column exists */
+      }
+      try {
+        await execSql("ALTER TABLE store_settings ADD COLUMN flash_sale_title_bn TEXT");
+      } catch {
+        /* column exists */
+      }
+      try {
+        await execSql("ALTER TABLE store_settings ADD COLUMN flash_sale_title_en TEXT");
+      } catch {
+        /* column exists */
+      }
+      try {
+        await execSql("ALTER TABLE store_settings ADD COLUMN flash_sale_end_time TEXT");
+      } catch {
+        /* column exists */
+      }
+
+      await execSql(
+        `INSERT INTO store_settings (
+          id, store_name, logo_url, logo_public_id, announcement, support_phone, whatsapp,
+          support_email, address, facebook_url, instagram_url, youtube_url,
+          delivery_inside_dhaka, delivery_outside_dhaka, delivery_time_inside,
+          delivery_time_outside, exchange_window_days, cod_enabled,
+          flash_sale_enabled, flash_sale_title_bn, flash_sale_title_en, flash_sale_end_time
+        ) VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT(id) DO UPDATE SET
+          store_name=excluded.store_name,
+          logo_url=excluded.logo_url,
+          logo_public_id=excluded.logo_public_id,
+          announcement=excluded.announcement,
+          support_phone=excluded.support_phone,
+          whatsapp=excluded.whatsapp,
+          support_email=excluded.support_email,
+          address=excluded.address,
+          facebook_url=excluded.facebook_url,
+          instagram_url=excluded.instagram_url,
+          youtube_url=excluded.youtube_url,
+          delivery_inside_dhaka=excluded.delivery_inside_dhaka,
+          delivery_outside_dhaka=excluded.delivery_outside_dhaka,
+          delivery_time_inside=excluded.delivery_time_inside,
+          delivery_time_outside=excluded.delivery_time_outside,
+          exchange_window_days=excluded.exchange_window_days,
+          cod_enabled=excluded.cod_enabled,
+          flash_sale_enabled=excluded.flash_sale_enabled,
+          flash_sale_title_bn=excluded.flash_sale_title_bn,
+          flash_sale_title_en=excluded.flash_sale_title_en,
+          flash_sale_end_time=excluded.flash_sale_end_time`,
+        [
+          input.storeName,
+          input.logoUrl || "",
+          input.logoPublicId || "",
+          input.announcement,
+          input.supportPhone,
+          input.whatsapp,
+          input.supportEmail,
+          input.address,
+          input.facebookUrl,
+          input.instagramUrl,
+          input.youtubeUrl,
+          input.deliveryInsideDhaka,
+          input.deliveryOutsideDhaka,
+          input.deliveryTimeInside,
+          input.deliveryTimeOutside,
+          input.exchangeWindowDays,
+          input.codEnabled ? 1 : 0,
+          input.flashSaleEnabled ? 1 : 0,
+          input.flashSaleTitleBn || "",
+          input.flashSaleTitleEn || "",
+          input.flashSaleEndTime || "",
+        ],
+      );
+    } catch (e) {
+      console.error("Error updating settings in DB:", e);
+    }
+  }
 }
 
 /* ----------------------------- dashboard reads ---------------------------- */

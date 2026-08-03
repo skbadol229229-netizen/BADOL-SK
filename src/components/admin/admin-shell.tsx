@@ -27,6 +27,7 @@ const nav = [
   { to: "/admin/products", label: "Products", Icon: Package },
   { to: "/admin/categories", label: "Categories", Icon: Tags },
   { to: "/admin/orders", label: "Orders", Icon: ShoppingCart },
+  { to: "/admin/offers", label: "Flash Sale & Offers", Icon: BadgePercent },
   { to: "/admin/banners", label: "Banners", Icon: ImageIcon },
   { to: "/admin/reviews", label: "Reviews", Icon: MessageSquare },
   { to: "/admin/settings", label: "Settings", Icon: Settings },
