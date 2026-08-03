@@ -153,9 +153,7 @@ function CheckoutPage() {
 
       clear();
       toast.success(
-        lang === "bn"
-          ? "আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে!"
-          : "Order placed successfully!",
+        lang === "bn" ? "আপনার অর্ডার সফলভাবে সম্পন্ন হয়েছে!" : "Order placed successfully!",
       );
       navigate({ to: "/order-success" });
     } catch (err) {
@@ -203,9 +201,7 @@ function CheckoutPage() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1 text-xs font-bold text-primary mb-2">
             <ShieldCheck className="h-4 w-4" />
             <span>
-              {lang === "bn"
-                ? "১০০% বিশ্বস্ত ক্যাশ অন ডেলিভারি"
-                : "100% Secure Cash on Delivery"}
+              {lang === "bn" ? "১০০% বিশ্বস্ত ক্যাশ অন ডেলিভারি" : "100% Secure Cash on Delivery"}
             </span>
           </div>
           <h1 className="text-2xl font-black text-[#0B2E13] dark:text-emerald-300 md:text-3xl">
@@ -218,11 +214,7 @@ function CheckoutPage() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          noValidate
-          className="grid gap-8 lg:grid-cols-12"
-        >
+        <form onSubmit={handleSubmit} noValidate className="grid gap-8 lg:grid-cols-12">
           {/* Left Form Column */}
           <div className="lg:col-span-7 space-y-6">
             {/* Step 1: Customer Info */}
@@ -238,7 +230,10 @@ function CheckoutPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="fullName" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="fullName"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     {lang === "bn" ? "আপনার পুরো নাম *" : "Your Full Name *"}
                   </label>
                   <input
@@ -256,7 +251,10 @@ function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="mobile" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="mobile"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     {lang === "bn" ? "মোবাইল নম্বর (১১ ডিজিট) *" : "Mobile Number (11 digits) *"}
                   </label>
                   <input
@@ -277,7 +275,10 @@ function CheckoutPage() {
 
                 {/* District Selector */}
                 <div>
-                  <label htmlFor="district" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="district"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     {lang === "bn" ? "জেলা (District) *" : "District *"}
                   </label>
                   <select
@@ -306,7 +307,10 @@ function CheckoutPage() {
 
                 {/* Detailed Address */}
                 <div>
-                  <label htmlFor="address" className="block text-xs font-bold text-foreground mb-1.5">
+                  <label
+                    htmlFor="address"
+                    className="block text-xs font-bold text-foreground mb-1.5"
+                  >
                     {lang === "bn" ? "সম্পূর্ণ ডেলিভারি ঠিকানা *" : "Complete Delivery Address *"}
                   </label>
                   <textarea
@@ -412,7 +416,9 @@ function CheckoutPage() {
               {/* Calculation Breakdown */}
               <div className="space-y-2.5 border-t border-border pt-4 text-xs font-medium text-foreground">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">{lang === "bn" ? "পণ্যের মোট মূল্য" : "Subtotal"}</span>
+                  <span className="text-muted-foreground">
+                    {lang === "bn" ? "পণ্যের মোট মূল্য" : "Subtotal"}
+                  </span>
                   <span className="font-semibold">{formatBDT(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">

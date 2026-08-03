@@ -199,7 +199,10 @@ function AdminSettingsPage() {
                 className="a-input"
               />
             </Field>
-            <Field label="Offer End Time (ISO Date/Time or timestamp)" hint="e.g. 2026-08-03T23:59:59">
+            <Field
+              label="Offer End Time (ISO Date/Time or timestamp)"
+              hint="e.g. 2026-08-03T23:59:59"
+            >
               <input
                 type="text"
                 value={form.flashSaleEndTime ?? ""}

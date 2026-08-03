@@ -122,7 +122,10 @@ export function FlashSaleSection() {
       {flashProducts.length > 0 && (
         <div className="relative z-10 mt-8 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4">
           {flashProducts.map((product) => (
-            <div key={product.id} className="relative group rounded-2xl bg-card p-2 text-foreground shadow-lg transition-transform hover:-translate-y-1">
+            <div
+              key={product.id}
+              className="relative group rounded-2xl bg-card p-2 text-foreground shadow-lg transition-transform hover:-translate-y-1"
+            >
               <div className="absolute top-3 left-3 z-20 rounded-full bg-red-600 px-2.5 py-0.5 text-[10px] font-extrabold text-white uppercase tracking-wider flex items-center gap-1 shadow-md">
                 <Zap className="h-3 w-3 fill-current" />
                 <span>HOT</span>

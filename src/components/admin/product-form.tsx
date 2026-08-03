@@ -241,7 +241,9 @@ export function ProductForm({
           {tab === "Sizes & Weights" && (
             <div className="space-y-6">
               <div>
-                <p className="a-label">Sizes / Weights / Quantities (e.g. 500g, 1kg, 2kg, 1 Dozen)</p>
+                <p className="a-label">
+                  Sizes / Weights / Quantities (e.g. 500g, 1kg, 2kg, 1 Dozen)
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {sizeOptions.map((size) => {
                     const on = form.sizes.includes(size);

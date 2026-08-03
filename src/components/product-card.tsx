@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Heart, Plus, Check } from "lucide-react";
+import { Heart, Plus, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/data/types";
 import { AppImage } from "@/components/app-image";
@@ -7,6 +7,7 @@ import { discountPercent, effectivePrice, formatBDT } from "@/lib/format";
 import { useCart } from "@/context/cart";
 import { useLanguage } from "@/context/language";
 import { toast } from "sonner";
+import { QuickViewModal } from "@/components/quick-view-modal";
 
 export function ProductCard({
   product,
@@ -16,9 +17,10 @@ export function ProductCard({
   priority?: boolean;
 }) {
   const { addItem } = useCart();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [added, setAdded] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
 
   const price = effectivePrice(product.regularPrice, product.salePrice);
   const off = discountPercent(product.regularPrice, product.salePrice);
@@ -45,101 +47,125 @@ export function ProductCard({
     toast(wishlisted ? "Remove from wishlist" : "Added to wishlist ❤️");
   };
 
+  const handleOpenQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuickViewOpen(true);
+  };
+
   return (
-    <div className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-border/70 bg-card p-3 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg">
-      <Link
-        to="/product/$slug"
-        params={{ slug: product.slug }}
-        className="relative block aspect-[4/3] w-full overflow-hidden rounded-[16px] bg-secondary/60"
-        aria-label={product.name}
-      >
-        <AppImage
-          src={product.images[0]}
-          alt={product.name}
-          width={600}
-          height={450}
-          eager={priority}
-          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-        />
-
-        {/* Top-Left Organic Badge */}
-        <div className="absolute left-2 top-2 z-10 flex flex-col gap-1">
-          <span className="rounded-md bg-[#7CB342] px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shadow-xs">
-            {t("organic")}
-          </span>
-          {off !== null && !soldOut && (
-            <span className="rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
-              -{off}%
-            </span>
-          )}
-        </div>
-
-        {/* Top-Right Wishlist Button */}
-        <button
-          type="button"
-          onClick={toggleWishlist}
-          aria-label="Wishlist"
-          className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-xs transition-transform hover:scale-110"
+    <>
+      <div className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-border bg-card p-3 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:shadow-lg">
+        {/* Product Image Box */}
+        <div
+          onClick={handleOpenQuickView}
+          className="relative block aspect-[4/3] w-full cursor-pointer overflow-hidden rounded-[16px] bg-secondary/60"
         >
-          <Heart
-            className={`h-4 w-4 transition-colors ${
-              wishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
-            }`}
+          <AppImage
+            src={product.images[0]}
+            alt={product.name}
+            width={600}
+            height={450}
+            eager={priority}
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
-        </button>
 
-        {soldOut && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-xs">
-            <span className="rounded-md bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {t("stockOut")}
+          {/* Top-Left Organic Badge */}
+          <div className="absolute left-2 top-2 z-10 flex flex-col gap-1">
+            <span className="rounded-md bg-[#7CB342] px-2.5 py-0.5 text-[10px] font-bold tracking-wide text-white shadow-xs">
+              {t("organic")}
             </span>
-          </div>
-        )}
-      </Link>
-
-      <div className="mt-3 flex min-w-0 flex-1 flex-col justify-between">
-        <div>
-          <Link to="/product/$slug" params={{ slug: product.slug }} className="block">
-            <h3 className="line-clamp-2 text-xs font-bold leading-snug text-[#0D1E11] transition-colors group-hover:text-primary sm:text-sm">
-              {product.name}
-            </h3>
-          </Link>
-          {weightLabel && (
-            <span className="mt-0.5 block text-[11px] font-medium text-muted-foreground">
-              {weightLabel}
-            </span>
-          )}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="text-sm font-extrabold text-[#0B2E13] sm:text-base">
-              {formatBDT(price)}
-            </span>
-            {off !== null && (
-              <span className="text-[10px] text-muted-foreground line-through">
-                {formatBDT(product.regularPrice)}
+            {off !== null && !soldOut && (
+              <span className="rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white shadow-xs">
+                -{off}%
               </span>
             )}
           </div>
 
-          {/* Bottom-Right Floating Green Add-to-Cart (+) Button */}
+          {/* Quick View Floating Overlay Button */}
           <button
             type="button"
-            onClick={handleQuickAdd}
-            disabled={soldOut}
-            aria-label={`Add ${product.name} to cart`}
-            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-bold shadow-md transition-all active:scale-95 ${
-              added
-                ? "bg-emerald-600 text-white"
-                : "bg-[#7CB342] text-white hover:bg-[#689f38] hover:shadow-lg"
-            }`}
+            onClick={handleOpenQuickView}
+            className="absolute inset-x-3 bottom-3 z-10 hidden items-center justify-center gap-1.5 rounded-xl bg-card/90 px-3 py-1.5 text-xs font-bold text-foreground shadow-md backdrop-blur-xs transition-all hover:bg-primary hover:text-white group-hover:flex"
           >
-            {added ? <Check className="h-4 w-4" /> : <Plus className="h-5 w-5" />}
+            <Eye className="h-3.5 w-3.5" />
+            <span>{lang === "bn" ? "দ্রুত দেখুন" : "Quick View"}</span>
           </button>
+
+          {/* Top-Right Wishlist Button */}
+          <button
+            type="button"
+            onClick={toggleWishlist}
+            aria-label="Wishlist"
+            className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-xs transition-transform hover:scale-110"
+          >
+            <Heart
+              className={`h-4 w-4 transition-colors ${
+                wishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
+              }`}
+            />
+          </button>
+
+          {soldOut && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-xs">
+              <span className="rounded-md bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                {t("stockOut")}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-3 flex min-w-0 flex-1 flex-col justify-between">
+          <div>
+            <Link to="/product/$slug" params={{ slug: product.slug }} className="block">
+              <h3 className="line-clamp-2 text-xs font-bold leading-snug text-foreground transition-colors group-hover:text-primary sm:text-sm">
+                {product.name}
+              </h3>
+            </Link>
+            {weightLabel && (
+              <span className="mt-0.5 block text-[11px] font-medium text-muted-foreground">
+                {weightLabel}
+              </span>
+            )}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <div className="flex flex-col">
+              <span className="text-sm font-extrabold text-primary sm:text-base">
+                {formatBDT(price)}
+              </span>
+              {off !== null && (
+                <span className="text-[10px] text-muted-foreground line-through">
+                  {formatBDT(product.regularPrice)}
+                </span>
+              )}
+            </div>
+
+            {/* Bottom-Right Green Add-to-Cart (+) Button */}
+            <button
+              type="button"
+              onClick={handleQuickAdd}
+              disabled={soldOut}
+              aria-label={`Add ${product.name} to cart`}
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-bold shadow-md transition-all active:scale-95 ${
+                added
+                  ? "bg-emerald-600 text-white"
+                  : "bg-[#7CB342] text-white hover:bg-[#689f38] hover:shadow-lg"
+              }`}
+            >
+              {added ? <Check className="h-4 w-4" /> : <Plus className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Quick View Modal */}
+      <QuickViewModal
+        product={product}
+        isOpen={quickViewOpen}
+        onClose={() => setQuickViewOpen(false)}
+      />
+    </>
   );
 }
 

@@ -107,10 +107,16 @@ export function ProductBrowser({
                 onChange={(e) => setSort(e.target.value as ProductFilters["sort"])}
                 className="h-10 rounded-xl border border-border bg-background px-3 text-xs font-medium outline-none focus:border-primary"
               >
-                <option value="featured">{lang === "bn" ? "পছন্দনীয় (Featured)" : "Featured"}</option>
+                <option value="featured">
+                  {lang === "bn" ? "পছন্দনীয় (Featured)" : "Featured"}
+                </option>
                 <option value="newest">{lang === "bn" ? "নতুন পণ্য (Newest)" : "Newest"}</option>
-                <option value="price-asc">{lang === "bn" ? "দাম: কম থেকে বেশি" : "Price: Low to High"}</option>
-                <option value="price-desc">{lang === "bn" ? "দাম: বেশি থেকে কম" : "Price: High to Low"}</option>
+                <option value="price-asc">
+                  {lang === "bn" ? "দাম: কম থেকে বেশি" : "Price: Low to High"}
+                </option>
+                <option value="price-desc">
+                  {lang === "bn" ? "দাম: বেশি থেকে কম" : "Price: High to Low"}
+                </option>
               </select>
             </div>
           </div>

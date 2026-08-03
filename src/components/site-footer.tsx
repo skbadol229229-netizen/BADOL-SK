@@ -24,7 +24,7 @@ export function SiteFooter() {
             </p>
           </div>
           <div className="flex flex-col gap-1 text-xs">
-            <p className="font-bold text-[#0B2E13]">
+            <p className="font-bold text-foreground">
               {lang === "bn" ? "🚚 এক্সপ্রেস ডেলিভারি চার্ট" : "🚚 Express Delivery Rate"}
             </p>
             <p className="text-muted-foreground">
@@ -38,7 +38,7 @@ export function SiteFooter() {
         {/* Link columns */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 pt-8 md:grid-cols-4 md:gap-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#0B2E13]">
+            <p className="text-xs font-bold uppercase tracking-wider text-foreground">
               {lang === "bn" ? "শপ ক্যাটাগরি" : "Shop Categories"}
             </p>
             <ul className="mt-3 space-y-0.5">
@@ -58,7 +58,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[#0B2E13]">
+            <p className="text-xs font-bold uppercase tracking-wider text-foreground">
               {lang === "bn" ? "তথ্য ও সহায়িকা" : "Information"}
             </p>
             <ul className="mt-3 space-y-0.5">
@@ -81,7 +81,7 @@ export function SiteFooter() {
           </div>
 
           <div className="col-span-2 md:col-span-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#0B2E13]">
+            <p className="text-xs font-bold uppercase tracking-wider text-foreground">
               {lang === "bn" ? "হটলাইন & যোগাযোগ" : "Contact & Support"}
             </p>
             <ul className="mt-3 space-y-1 text-xs">
@@ -94,7 +94,7 @@ export function SiteFooter() {
           </div>
 
           <div className="col-span-2 md:col-span-1">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#0B2E13]">
+            <p className="text-xs font-bold uppercase tracking-wider text-foreground">
               {lang === "bn" ? "আমাদের ঠিকানা" : "Main Office"}
             </p>
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground">

@@ -79,7 +79,10 @@ function OrderSuccessPage() {
         <div className="rounded-3xl border border-primary/20 bg-card p-6 sm:p-10 shadow-xl text-center relative overflow-hidden">
           <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-[#0B2E13] via-[#7CB342] to-[#0B2E13]" />
 
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 mb-4 animate-bounce" style={{ animationDuration: "3s" }}>
+          <div
+            className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 mb-4 animate-bounce"
+            style={{ animationDuration: "3s" }}
+          >
             <CheckCircle2 className="h-12 w-12 text-emerald-600" />
           </div>
 
@@ -158,11 +161,15 @@ function OrderSuccessPage() {
           {/* Pricing Totals */}
           <div className="bg-muted/30 border-t border-border px-6 py-4 space-y-2 text-xs font-semibold text-foreground">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{lang === "bn" ? "পণ্যের মোট দাম" : "Subtotal"}</span>
+              <span className="text-muted-foreground">
+                {lang === "bn" ? "পণ্যের মোট দাম" : "Subtotal"}
+              </span>
               <span>{formatBDT(order.subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{lang === "bn" ? "ডেলিভারি চার্জ" : "Delivery Fee"}</span>
+              <span className="text-muted-foreground">
+                {lang === "bn" ? "ডেলিভারি চার্জ" : "Delivery Fee"}
+              </span>
               <span>{formatBDT(order.deliveryCharge)}</span>
             </div>
             <div className="flex justify-between border-t border-border/80 pt-3 text-sm font-black text-[#0B2E13] dark:text-emerald-300">
@@ -184,7 +191,8 @@ function OrderSuccessPage() {
             </p>
             {order.customer.note && (
               <p className="text-muted-foreground italic pt-1">
-                {lang === "bn" ? "বিশেষ নোট: " : "Note: "}{order.customer.note}
+                {lang === "bn" ? "বিশেষ নোট: " : "Note: "}
+                {order.customer.note}
               </p>
             )}
           </div>

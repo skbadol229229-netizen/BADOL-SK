@@ -124,7 +124,10 @@ export function mapSettings(row: Row | null): StoreSettings {
     deliveryTimeOutside: (row.delivery_time_outside as string) ?? "",
     exchangeWindowDays: Number(row.exchange_window_days ?? 7),
     codEnabled: Boolean(row.cod_enabled ?? 1),
-    flashSaleEnabled: row.flash_sale_enabled != null ? Boolean(row.flash_sale_enabled) : defaultSettings.flashSaleEnabled,
+    flashSaleEnabled:
+      row.flash_sale_enabled != null
+        ? Boolean(row.flash_sale_enabled)
+        : defaultSettings.flashSaleEnabled,
     flashSaleTitleBn: (row.flash_sale_title_bn as string) || defaultSettings.flashSaleTitleBn,
     flashSaleTitleEn: (row.flash_sale_title_en as string) || defaultSettings.flashSaleTitleEn,
     flashSaleEndTime: (row.flash_sale_end_time as string) || defaultSettings.flashSaleEndTime,

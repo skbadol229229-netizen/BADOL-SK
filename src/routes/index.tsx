@@ -181,7 +181,7 @@ function HomePage() {
       {/* CATEGORY HORIZONTAL SCROLL SECTION */}
       <section className="mt-6 mx-auto max-w-7xl px-3 sm:px-6">
         <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-base font-extrabold text-[#0B2E13] sm:text-lg">
+          <h2 className="text-base font-extrabold text-foreground sm:text-lg">
             {t("shopByCategory")}
           </h2>
           <Link
@@ -202,7 +202,7 @@ function HomePage() {
               params={{ slug: c.slug }}
               className="group flex flex-col items-center shrink-0 w-20 sm:w-24 text-center"
             >
-              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 border-border/80 bg-white p-1 shadow-xs transition-all duration-300 group-hover:border-[#7CB342] group-hover:scale-105 group-hover:shadow-md overflow-hidden flex items-center justify-center">
+              <div className="h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 border-border/80 bg-card p-1 shadow-xs transition-all duration-300 group-hover:border-[#7CB342] group-hover:scale-105 group-hover:shadow-md overflow-hidden flex items-center justify-center">
                 <AppImage
                   src={
                     c.image ||
@@ -214,7 +214,7 @@ function HomePage() {
                   className="h-full w-full rounded-full object-cover"
                 />
               </div>
-              <span className="mt-2 text-[11px] font-bold text-[#0D1E11] line-clamp-2 leading-tight group-hover:text-primary">
+              <span className="mt-2 text-[11px] font-bold text-foreground line-clamp-2 leading-tight group-hover:text-primary">
                 {c.name}
               </span>
             </Link>
@@ -234,7 +234,7 @@ function HomePage() {
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#7CB342]">
               {t("organicChoice")}
             </span>
-            <h2 className="text-lg font-extrabold text-[#0B2E13] sm:text-2xl">
+            <h2 className="text-lg font-extrabold text-foreground sm:text-2xl">
               {t("bestSellers")} 🌿
             </h2>
           </div>
@@ -259,13 +259,13 @@ function HomePage() {
             {trustBadges.map(({ Icon, titleKey, descKey }) => (
               <div
                 key={titleKey}
-                className="flex items-center gap-3 rounded-2xl bg-[#0B2E13]/5 p-3.5 border border-primary/10 transition-transform hover:scale-[1.02]"
+                className="flex items-center gap-3 rounded-2xl bg-primary/5 dark:bg-primary/10 p-3.5 border border-primary/10 transition-transform hover:scale-[1.02]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0B2E13] text-[#7CB342] shadow-xs">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-xs">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-[#0B2E13] sm:text-sm">{t(titleKey)}</h3>
+                  <h3 className="text-xs font-bold text-foreground sm:text-sm">{t(titleKey)}</h3>
                   <p className="text-[10px] text-muted-foreground leading-tight sm:text-xs">
                     {t(descKey)}
                   </p>

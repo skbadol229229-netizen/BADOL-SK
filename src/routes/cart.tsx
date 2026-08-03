@@ -88,9 +88,7 @@ function CartPage() {
                           {line.name}
                         </Link>
                         {line.size && (
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {line.size}
-                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">{line.size}</p>
                         )}
                       </div>
                       <button
