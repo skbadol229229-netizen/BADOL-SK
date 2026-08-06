@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import { AdminCard, AdminShell, Field } from "@/components/admin/admin-shell";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { formatImageUrl } from "@/lib/utils";
 import type { Banner } from "@/data/types";
 import {
   adminCreateBanner,
@@ -199,7 +200,7 @@ function AdminBannersPage() {
               <div className="flex min-w-0 gap-3">
                 {b.image && (
                   <img
-                    src={b.image}
+                    src={formatImageUrl(b.image)}
                     alt={b.title}
                     width={128}
                     height={72}

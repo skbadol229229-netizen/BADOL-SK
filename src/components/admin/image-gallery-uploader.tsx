@@ -1,5 +1,13 @@
 import { useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, GripVertical, ImagePlus, Loader2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  GripVertical,
+  ImagePlus,
+  Loader2,
+  RefreshCw,
+  X,
+} from "lucide-react";
 import { uploadToTelegram, validateImageFile, type UploadStage } from "@/lib/telegram-upload";
 import { formatBytes } from "@/lib/image-compress";
 import { cn, formatImageUrl } from "@/lib/utils";
@@ -15,6 +23,8 @@ type Pending = { name: string; progress: number; stage: UploadStage };
 
 export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const replaceInputRef = useRef<HTMLInputElement>(null);
+  const [replacingIndex, setReplacingIndex] = useState<number | null>(null);
   const [pending, setPending] = useState<Pending[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [savings, setSavings] = useState<string | null>(null);
@@ -41,6 +51,49 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
       urls.filter((_, i) => i !== index),
       ids.filter((_, i) => i !== index),
     );
+  }
+
+  function triggerReplace(index: number) {
+    setReplacingIndex(index);
+    if (replaceInputRef.current) {
+      replaceInputRef.current.value = "";
+      replaceInputRef.current.click();
+    }
+  }
+
+  async function handleReplaceFile(file: File | undefined) {
+    if (!file || replacingIndex === null) return;
+    const idx = replacingIndex;
+    setReplacingIndex(null);
+
+    const invalid = validateImageFile(file);
+    if (invalid) {
+      setErrors([invalid]);
+      return;
+    }
+
+    setPending([{ name: file.name, progress: 0, stage: "compressing" }]);
+    try {
+      const result = await uploadToTelegram(
+        file,
+        (percent) => {
+          setPending([{ name: file.name, progress: percent, stage: "uploading" }]);
+        },
+        (stage) => {
+          setPending([{ name: file.name, progress: 0, stage }]);
+        },
+      );
+      const nextUrls = [...urls];
+      const nextIds = [...ids];
+      nextUrls[idx] = result.url;
+      nextIds[idx] = result.fileId;
+      onChange(nextUrls, nextIds);
+      setSavings(`Replaced image — ${formatBytes(result.compressedBytes)}`);
+    } catch (e) {
+      setErrors([`Failed to replace: ${(e as Error).message}`]);
+    } finally {
+      setPending([]);
+    }
   }
 
   async function handleFiles(fileList: FileList | null) {
@@ -80,7 +133,7 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
             setPending((prev) => prev.map((p, index) => (index === i ? { ...p, stage } : p)));
           },
         );
-        nextUrls.push(result.fileId);
+        nextUrls.push(result.url);
         nextIds.push(result.fileId);
         originalTotal += result.originalBytes;
         compressedTotal += result.compressedBytes;
@@ -111,6 +164,14 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
         onChange={(e) => void handleFiles(e.target.files)}
       />
 
+      <input
+        ref={replaceInputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={(e) => void handleReplaceFile(e.target.files?.[0])}
+      />
+
       {urls.length > 0 && (
         <ul className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
           {urls.map((url, index) => (
@@ -126,13 +187,13 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
               }}
               onDragEnd={() => setDragIndex(null)}
               className={cn(
-                "group relative border border-border bg-muted",
+                "group relative border border-border bg-muted rounded-lg overflow-hidden",
                 dragIndex === index && "opacity-50",
               )}
             >
               <img src={formatImageUrl(url)} alt="" className="media-4x5 w-full object-cover" />
               {index === 0 && (
-                <span className="absolute left-0 top-0 bg-foreground px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-background">
+                <span className="absolute left-0 top-0 rounded-br bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow-xs">
                   Cover
                 </span>
               )}
@@ -145,27 +206,40 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
                   aria-label="Move image left"
                   disabled={disabled || busy || index === 0}
                   onClick={() => move(index, index - 1)}
-                  className="flex h-9 w-9 items-center justify-center disabled:opacity-30"
+                  className="flex h-9 w-9 items-center justify-center hover:bg-secondary disabled:opacity-30"
+                  title="Move left"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Replace image"
+                  disabled={disabled || busy}
+                  onClick={() => triggerReplace(index)}
+                  className="flex h-9 w-9 items-center justify-center text-primary hover:bg-secondary"
+                  title="Change / Replace photo"
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   aria-label="Remove image"
                   disabled={disabled || busy}
                   onClick={() => remove(index)}
-                  className="flex h-9 w-9 items-center justify-center text-destructive"
+                  className="flex h-9 w-9 items-center justify-center text-destructive hover:bg-destructive/10"
+                  title="Delete image"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   aria-label="Move image right"
                   disabled={disabled || busy || index === urls.length - 1}
                   onClick={() => move(index, index + 1)}
-                  className="flex h-9 w-9 items-center justify-center disabled:opacity-30"
+                  className="flex h-9 w-9 items-center justify-center hover:bg-secondary disabled:opacity-30"
+                  title="Move right"
                 >
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             </li>

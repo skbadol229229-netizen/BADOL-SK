@@ -47,7 +47,7 @@ export function ImageUploader({
     setProgress(0);
     try {
       const result = await uploadToTelegram(file, setProgress, setStage);
-      onChange({ url: result.fileId, publicId: result.fileId });
+      onChange({ url: result.url, publicId: result.fileId });
       setSavings(
         result.compressedBytes < result.originalBytes
           ? `${formatBytes(result.originalBytes)} → ${formatBytes(result.compressedBytes)}`

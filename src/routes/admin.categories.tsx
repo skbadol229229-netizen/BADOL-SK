@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Plus, X } from "lucide-react";
 import { AdminCard, AdminShell, Field } from "@/components/admin/admin-shell";
 import { ImageUploader } from "@/components/admin/image-uploader";
+import { formatImageUrl } from "@/lib/utils";
 import type { Category } from "@/data/types";
 import {
   adminCreateCategory,
@@ -223,7 +224,7 @@ function AdminCategoriesPage() {
               <div className="flex min-w-0 gap-3">
                 {c.image && (
                   <img
-                    src={c.image}
+                    src={formatImageUrl(c.image)}
                     alt={c.name}
                     width={64}
                     height={64}

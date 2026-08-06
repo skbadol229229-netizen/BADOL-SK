@@ -1,6 +1,6 @@
 import { Leaf } from "lucide-react";
 import { useSettings } from "@/hooks/use-store";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 type Props = {
   className?: string;
@@ -17,7 +17,11 @@ export function BrandMark({ className, logoClassName = "h-8 sm:h-9", textClassNa
     <span className={cn("inline-flex min-w-0 items-center gap-2", className)}>
       {settings.logoUrl ? (
         <span className={cn("shrink-0 overflow-hidden rounded-md", logoClassName)}>
-          <img src={settings.logoUrl} alt={name} className="h-full w-full object-cover" />
+          <img
+            src={formatImageUrl(settings.logoUrl)}
+            alt={name}
+            className="h-full w-full object-cover"
+          />
         </span>
       ) : (
         <span className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl bg-[#0B2E13] text-[#7CB342] shadow-xs">

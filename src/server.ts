@@ -54,7 +54,7 @@ export default {
       }
 
       if (url.pathname.startsWith("/api/images/")) {
-        const fileId = url.pathname.replace("/api/images/", "");
+        const fileId = decodeURIComponent(url.pathname.replace("/api/images/", ""));
         return await handleServeImage(fileId, env);
       }
 
