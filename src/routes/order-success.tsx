@@ -5,6 +5,7 @@ import { Container, EmptyState } from "@/components/ui-states";
 import { readOrder } from "@/lib/order-storage";
 import type { PlacedOrder } from "@/data/types";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 import { useSettings } from "@/hooks/use-store";
 import { useLanguage } from "@/context/language";
 
@@ -141,7 +142,7 @@ function OrderSuccessPage() {
             {order.lines.map((l) => (
               <li key={`${l.productId}-${l.size}`} className="py-4 flex gap-4 items-center">
                 <img
-                  src={l.image}
+                  src={formatImageUrl(l.image)}
                   alt={l.name}
                   className="h-16 w-16 shrink-0 rounded-2xl object-cover bg-muted border border-border"
                 />

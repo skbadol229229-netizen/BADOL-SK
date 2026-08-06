@@ -12,6 +12,7 @@ import {
   adminUpdateSettings,
 } from "@/lib/admin";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 import type { Product, StoreSettings } from "@/data/types";
 
 export const Route = createFileRoute("/admin/offers")({
@@ -324,8 +325,9 @@ function AdminOffersPage() {
                         <div className="flex items-center gap-3">
                           <img
                             src={
-                              p.images[0] ||
-                              "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=100&q=80"
+                              p.images[0]
+                                ? formatImageUrl(p.images[0])
+                                : "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=100&q=80"
                             }
                             alt={p.name}
                             className="h-10 w-10 shrink-0 rounded-lg object-cover border border-border"

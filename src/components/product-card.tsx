@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Heart, Plus, Check, Eye } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/data/types";
+import { cn, formatImageUrl } from "@/lib/utils";
 import { AppImage } from "@/components/app-image";
 import { discountPercent, effectivePrice, formatBDT } from "@/lib/format";
 import { useCart } from "@/context/cart";
@@ -38,7 +39,7 @@ export function ProductCard({
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[0],
+      image: formatImageUrl(product.images[0]),
       unitPrice: price,
       size: weightLabel || "Standard",
       quantity: 1,

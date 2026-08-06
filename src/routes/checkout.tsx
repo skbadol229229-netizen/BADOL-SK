@@ -10,6 +10,7 @@ import { useSettings } from "@/hooks/use-store";
 import { useLanguage } from "@/context/language";
 import { placeTursoOrder } from "@/lib/admin";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 import { saveOrder } from "@/lib/order-storage";
 
 export const Route = createFileRoute("/checkout")({
@@ -396,7 +397,7 @@ function CheckoutPage() {
                 {lines.map((l) => (
                   <li key={`${l.productId}-${l.size}`} className="py-3 flex gap-3 items-center">
                     <img
-                      src={l.image}
+                      src={formatImageUrl(l.image)}
                       alt={l.name}
                       className="h-14 w-14 shrink-0 rounded-xl object-cover bg-muted border border-border"
                     />

@@ -7,6 +7,7 @@ import { useDebounced } from "@/hooks/use-debounced";
 import { useLanguage } from "@/context/language";
 import { fetchProducts, priceOf } from "@/data/api";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 
 export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { lang } = useLanguage();
@@ -176,7 +177,7 @@ export function SearchModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-primary/20 bg-secondary">
                     {product.images[0] && (
                       <img
-                        src={product.images[0]}
+                        src={formatImageUrl(product.images[0])}
                         alt={product.name}
                         className="h-full w-full object-cover"
                       />

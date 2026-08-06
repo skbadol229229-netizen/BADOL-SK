@@ -26,6 +26,7 @@ import {
   type ProductInput,
 } from "@/lib/admin";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin/products")({
   head: () => ({
@@ -256,7 +257,7 @@ function AdminProductsPage() {
                       <div className="flex min-w-0 items-center gap-3">
                         {p.images[0] ? (
                           <img
-                            src={p.images[0]}
+                            src={formatImageUrl(p.images[0])}
                             alt={p.name}
                             className="h-11 w-11 shrink-0 rounded-md object-cover"
                           />

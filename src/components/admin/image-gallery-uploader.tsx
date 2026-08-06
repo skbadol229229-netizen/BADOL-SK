@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, GripVertical, ImagePlus, Loader2, X } from "lucide-react";
-import { uploadToCloudinary, validateImageFile, type UploadStage } from "@/lib/cloudinary";
+import { uploadToTelegram, validateImageFile, type UploadStage } from "@/lib/telegram-upload";
 import { formatBytes } from "@/lib/image-compress";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 type Props = {
   urls: string[];
@@ -69,7 +69,7 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
     for (let i = 0; i < accepted.length; i += 1) {
       const file = accepted[i];
       try {
-        const result = await uploadToCloudinary(
+        const result = await uploadToTelegram(
           file,
           (percent) => {
             setPending((prev) =>
@@ -80,8 +80,8 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
             setPending((prev) => prev.map((p, index) => (index === i ? { ...p, stage } : p)));
           },
         );
-        nextUrls.push(result.url);
-        nextIds.push(result.publicId);
+        nextUrls.push(result.fileId);
+        nextIds.push(result.fileId);
         originalTotal += result.originalBytes;
         compressedTotal += result.compressedBytes;
       } catch (e) {
@@ -130,7 +130,7 @@ export function ImageGalleryUploader({ urls, publicIds, onChange, disabled }: Pr
                 dragIndex === index && "opacity-50",
               )}
             >
-              <img src={url} alt="" className="media-4x5 w-full object-cover" />
+              <img src={formatImageUrl(url)} alt="" className="media-4x5 w-full object-cover" />
               {index === 0 && (
                 <span className="absolute left-0 top-0 bg-foreground px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-background">
                   Cover

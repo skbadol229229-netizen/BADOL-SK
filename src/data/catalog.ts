@@ -159,7 +159,8 @@ export const defaultProducts: Product[] = [
     name: "Sundarban Raw Wild Flower Honey (500g) / সুন্দরবন র মধু",
     slug: "sundarban-raw-wild-honey",
     shortDescription: "100% pure unheated raw wild flower honey from Sundarban mangrove forest.",
-    fullDescription: "Harvested sustainably by traditional honey collectors. Unfiltered, rich in natural enzymes, antioxidants, and wildflower pollen.",
+    fullDescription:
+      "Harvested sustainably by traditional honey collectors. Unfiltered, rich in natural enzymes, antioxidants, and wildflower pollen.",
     categorySlug: "pure-honey",
     images: [
       "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80",
@@ -182,7 +183,8 @@ export const defaultProducts: Product[] = [
     name: "Premium Pabna Cow Milk Ghee / খাঁটি গাভীর ঘি (500g)",
     slug: "pabna-organic-cow-ghee",
     shortDescription: "Aromatic granular desi cow milk ghee churned traditionally in Pabna.",
-    fullDescription: "Made from pure milk fat. Rich golden color and heavenly aroma that elevates every traditional Bangladeshi meal.",
+    fullDescription:
+      "Made from pure milk fat. Rich golden color and heavenly aroma that elevates every traditional Bangladeshi meal.",
     categorySlug: "oils-and-ghee",
     images: [
       "https://images.unsplash.com/photo-1631451095765-2c91616fc9e6?auto=format&fit=crop&w=800&q=80",
@@ -205,7 +207,8 @@ export const defaultProducts: Product[] = [
     name: "Wood-Pressed Cold Mustard Oil / কাঠের ঘানির সরিষার তেল (1L)",
     slug: "kather-ghani-mustard-oil",
     shortDescription: "Traditional Kather Ghani wood-pressed pungent virgin mustard oil.",
-    fullDescription: "Cold extracted without heat or chemicals. Retains full natural aroma, pungency, and vital nutrients.",
+    fullDescription:
+      "Cold extracted without heat or chemicals. Retains full natural aroma, pungency, and vital nutrients.",
     categorySlug: "oils-and-ghee",
     images: [
       "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80",
@@ -227,8 +230,10 @@ export const defaultProducts: Product[] = [
     id: "p-tomatoes",
     name: "Organic Tomatoes (Deshi) / দেশি লাল টমেটো (১ কেজি)",
     slug: "organic-tomatoes-deshi",
-    shortDescription: "Freshly plucked farm-fresh organic red tomatoes grown without synthetic fertilizer.",
-    fullDescription: "Rich in lycopene and natural sweetness. Farm Sourced directly from Bogura organic gardens.",
+    shortDescription:
+      "Freshly plucked farm-fresh organic red tomatoes grown without synthetic fertilizer.",
+    fullDescription:
+      "Rich in lycopene and natural sweetness. Farm Sourced directly from Bogura organic gardens.",
     categorySlug: "vegetables",
     images: [
       "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80",
@@ -297,7 +302,8 @@ export const defaultProducts: Product[] = [
     name: "Premium Kalojira Seeds / প্রিমিয়াম কালোজিরা (250g)",
     slug: "premium-kalojira-seeds",
     shortDescription: "Clean, fragrant organic black cumin seeds carefully sifted and packed.",
-    fullDescription: "Known as the miracle seed for immune wellness. Perfect for daily consumption or spice seasoning.",
+    fullDescription:
+      "Known as the miracle seed for immune wellness. Perfect for daily consumption or spice seasoning.",
     categorySlug: "seeds-and-nuts",
     images: [
       "https://images.unsplash.com/photo-1509358271058-acd05cc93898?auto=format&fit=crop&w=800&q=80",
@@ -320,7 +326,8 @@ export const defaultProducts: Product[] = [
     name: "Organic Chia Seeds / অর্গানিক চিয়া সিড (500g)",
     slug: "organic-chia-seeds",
     shortDescription: "High-fiber organic chia seeds rich in Omega-3 and protein.",
-    fullDescription: "Triple washed and air dried. Ideal for morning smoothies, puddings, or hydration drinks.",
+    fullDescription:
+      "Triple washed and air dried. Ideal for morning smoothies, puddings, or hydration drinks.",
     categorySlug: "seeds-and-nuts",
     images: [
       "https://images.unsplash.com/photo-1514733670139-4d87a1941d55?auto=format&fit=crop&w=800&q=80",
@@ -343,7 +350,8 @@ export const defaultProducts: Product[] = [
     name: "Pure Stone-Ground Turmeric / হলুদের গুঁড়া (250g)",
     slug: "pure-stone-ground-turmeric",
     shortDescription: "High-curcumin aromatic turmeric ground directly from dried organic roots.",
-    fullDescription: "Chemical-free turmeric harvested in Pabna. Deep golden color and authentic earthy aroma.",
+    fullDescription:
+      "Chemical-free turmeric harvested in Pabna. Deep golden color and authentic earthy aroma.",
     categorySlug: "organic-spices",
     images: [
       "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80",
@@ -365,8 +373,10 @@ export const defaultProducts: Product[] = [
     id: "p-green-tea",
     name: "Organic Sylhet Green Tea / সিলেটের গ্রিন টি (200g)",
     slug: "sylhet-organic-green-tea",
-    shortDescription: "Hand-picked whole leaf green tea from organic estates in Sreemangal, Sylhet.",
-    fullDescription: "Antioxidant-rich whole green tea leaves with a refreshing light floral finish.",
+    shortDescription:
+      "Hand-picked whole leaf green tea from organic estates in Sreemangal, Sylhet.",
+    fullDescription:
+      "Antioxidant-rich whole green tea leaves with a refreshing light floral finish.",
     categorySlug: "herbal-and-tea",
     images: [
       "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&w=800&q=80",

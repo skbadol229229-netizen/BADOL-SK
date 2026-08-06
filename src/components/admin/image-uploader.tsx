@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, Upload, X } from "lucide-react";
-import { uploadToCloudinary, validateImageFile, type UploadStage } from "@/lib/cloudinary";
+import { uploadToTelegram, validateImageFile, type UploadStage } from "@/lib/telegram-upload";
 import { formatBytes } from "@/lib/image-compress";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 export type UploadedImage = { url: string; publicId: string };
 
@@ -46,8 +46,8 @@ export function ImageUploader({
     setStage("compressing");
     setProgress(0);
     try {
-      const result = await uploadToCloudinary(file, setProgress, setStage);
-      onChange({ url: result.url, publicId: result.publicId });
+      const result = await uploadToTelegram(file, setProgress, setStage);
+      onChange({ url: result.fileId, publicId: result.fileId });
       setSavings(
         result.compressedBytes < result.originalBytes
           ? `${formatBytes(result.originalBytes)} → ${formatBytes(result.compressedBytes)}`
@@ -80,7 +80,7 @@ export function ImageUploader({
               previewClassName,
             )}
           >
-            <img src={value.url} alt="" className="h-full w-full object-cover" />
+            <img src={formatImageUrl(value.url)} alt="" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-wrap gap-2">
             <button

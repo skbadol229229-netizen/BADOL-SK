@@ -8,6 +8,8 @@ import { useCart } from "@/context/cart";
 import { useLanguage } from "@/context/language";
 import { discountPercent, effectivePrice, formatBDT, getAdjustedPrices } from "@/lib/format";
 
+import { formatImageUrl } from "@/lib/utils";
+
 export function QuickViewModal({
   product,
   isOpen,
@@ -63,7 +65,7 @@ export function QuickViewModal({
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[activeImg] || product.images[0],
+      image: formatImageUrl(product.images[activeImg] || product.images[0]),
       unitPrice: price,
       size: currentSize,
       quantity: qty,
@@ -81,7 +83,7 @@ export function QuickViewModal({
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[activeImg] || product.images[0],
+      image: formatImageUrl(product.images[activeImg] || product.images[0]),
       unitPrice: price,
       size: currentSize,
       quantity: qty,
@@ -133,7 +135,7 @@ export function QuickViewModal({
               </div>
 
               <img
-                src={product.images[activeImg] || product.images[0]}
+                src={formatImageUrl(product.images[activeImg] || product.images[0])}
                 alt={product.name}
                 className="h-full w-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
               />
@@ -153,7 +155,7 @@ export function QuickViewModal({
                         : "border-border opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img src={formatImageUrl(img)} alt="" className="h-full w-full object-cover" />
                   </button>
                 ))}
               </div>

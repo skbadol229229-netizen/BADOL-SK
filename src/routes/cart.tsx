@@ -3,6 +3,7 @@ import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-reac
 import { Container, EmptyState, PageHeading } from "@/components/ui-states";
 import { lineKey, useCart } from "@/context/cart";
 import { formatBDT } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 import { useSettings } from "@/hooks/use-store";
 import { useLanguage } from "@/context/language";
 
@@ -87,7 +88,7 @@ function CartPage() {
                     className="relative shrink-0 overflow-hidden rounded-2xl border-2 border-primary/20 bg-secondary/40 p-1 shadow-xs transition-transform group-hover:scale-105"
                   >
                     <img
-                      src={line.image}
+                      src={formatImageUrl(line.image)}
                       alt={line.name}
                       width={120}
                       height={120}

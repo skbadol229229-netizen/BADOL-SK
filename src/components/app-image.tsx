@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn, formatImageUrl } from "@/lib/utils";
 
 type Props = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "loading"> & {
   /** Render eagerly (above-the-fold imagery such as the hero). */
@@ -13,18 +13,22 @@ type Props = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "loading"> & {
  * fades in from a faint blur and settles to scale 1. Keeps layout identical to
  * a plain <img> — the placeholder is the element's own background tint.
  */
-export function AppImage({ eager = false, mobileSrc, className, ...props }: Props) {
+export function AppImage({ eager = false, mobileSrc, className, src: rawSrc, ...props }: Props) {
   const ref = useRef<HTMLImageElement>(null);
   const [loaded, setLoaded] = useState(false);
+
+  const src = formatImageUrl(rawSrc);
+  const mobile = formatImageUrl(mobileSrc);
 
   // Cached images can be complete before React attaches onLoad.
   useEffect(() => {
     if (ref.current?.complete) setLoaded(true);
-  }, [props.src]);
+  }, [src]);
 
   const img = (
     <img
       {...props}
+      src={src}
       ref={ref}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
@@ -41,11 +45,11 @@ export function AppImage({ eager = false, mobileSrc, className, ...props }: Prop
     />
   );
 
-  if (!mobileSrc) return img;
+  if (!mobile) return img;
 
   return (
     <picture>
-      <source media="(max-width: 767px)" srcSet={mobileSrc} />
+      <source media="(max-width: 767px)" srcSet={mobile} />
       {img}
     </picture>
   );

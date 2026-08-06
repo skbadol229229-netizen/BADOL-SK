@@ -19,6 +19,7 @@ import { AppImage } from "@/components/app-image";
 import { fetchProduct, fetchRelated, fetchReviews } from "@/data/api";
 import { useSettings } from "@/hooks/use-store";
 import { discountPercent, effectivePrice, formatBDT, getAdjustedPrices } from "@/lib/format";
+import { formatImageUrl } from "@/lib/utils";
 import { useCart } from "@/context/cart";
 import { useLanguage } from "@/context/language";
 import type { Product } from "@/data/types";
@@ -111,7 +112,7 @@ function ProductPage() {
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[activeImage] || product.images[0],
+      image: formatImageUrl(product.images[activeImage] || product.images[0]),
       unitPrice: price,
       size: size ?? "Standard",
       quantity,
@@ -137,7 +138,7 @@ function ProductPage() {
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      image: product.images[activeImage] || product.images[0],
+      image: formatImageUrl(product.images[activeImage] || product.images[0]),
       unitPrice: price,
       size: size ?? "Standard",
       quantity,

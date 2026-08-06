@@ -229,7 +229,9 @@ export async function ensureDbSchema(): Promise<void> {
 
       // Auto-seed categories if empty
       try {
-        const cCount = await queryRows<{ count: number }>("SELECT COUNT(*) as count FROM categories");
+        const cCount = await queryRows<{ count: number }>(
+          "SELECT COUNT(*) as count FROM categories",
+        );
         const count = cCount?.[0]?.count ?? 0;
         if (count === 0 && defaultCategories.length > 0) {
           for (const c of defaultCategories) {
