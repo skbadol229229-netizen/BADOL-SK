@@ -174,28 +174,12 @@ export type AdminStats = {
 };
 
 export async function fetchAdminStats(): Promise<AdminStats> {
-  if (!isTursoConfigured) {
-    return {
-      totalOrders: 0,
-      pendingOrders: 0,
-      deliveredOrders: 0,
-      revenue: 0,
-      pipelineValue: 0,
-      totalProducts: 0,
-      activeProducts: 0,
-      outOfStock: 0,
-      totalCategories: 0,
-      pendingReviews: 0,
-      statusCounts: {},
-    };
-  }
-
   try {
     const [orders, products, categories, reviews] = await Promise.all([
-      queryRows<{ status: string; total: number }>("SELECT status, total FROM orders"),
-      queryRows<{ active: number; stock: number }>("SELECT active, stock FROM products"),
-      queryRows<{ id: string }>("SELECT id FROM categories"),
-      queryRows<{ approved: number }>("SELECT approved FROM reviews"),
+      adminListOrders(),
+      adminListProducts(),
+      adminListCategories(),
+      adminListReviews(),
     ]);
 
     let totalOrders = 0;
@@ -265,18 +249,17 @@ export type LowStockRow = {
 
 export async function fetchLowStock(threshold = 5): Promise<LowStockRow[]> {
   try {
-    const rows = await queryRows<Record<string, unknown>>(
-      "SELECT id, name, slug, sku, stock, active FROM products WHERE stock <= ? ORDER BY stock ASC",
-      [threshold],
-    );
-    return rows.map((r) => ({
-      id: String(r.id),
-      name: String(r.name),
-      slug: String(r.slug),
-      sku: String(r.sku ?? ""),
-      stock: Number(r.stock ?? 0),
-      active: Boolean(r.active),
-    }));
+    const products = await adminListProducts();
+    return products
+      .filter((p) => p.stock <= threshold)
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        sku: p.sku,
+        stock: p.stock,
+        active: p.active,
+      }));
   } catch {
     return defaultProducts
       .filter((p) => p.stock <= threshold)
@@ -293,31 +276,58 @@ export async function fetchLowStock(threshold = 5): Promise<LowStockRow[]> {
 
 /* --------------------------------- products ------------------------------- */
 
+const STORAGE_KEY_PRODUCTS = "purebengal_products_store_v2";
+const STORAGE_KEY_CATEGORIES = "purebengal_categories_store_v2";
+const STORAGE_KEY_BANNERS = "purebengal_banners_store_v2";
+const STORAGE_KEY_REVIEWS = "purebengal_reviews_store_v2";
+
+export function getLocalProducts(): Product[] {
+  if (typeof window === "undefined") return defaultProducts;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY_PRODUCTS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(defaultProducts));
+  } catch {
+    /* ignore */
+  }
+  return defaultProducts;
+}
+
+export function saveLocalProducts(products: Product[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY_PRODUCTS, JSON.stringify(products));
+  } catch {
+    /* ignore */
+  }
+}
+
 export type ProductInput = Omit<Product, "id" | "createdAt">;
 
 export async function adminListProducts(): Promise<Product[]> {
   await ensureDbSchema();
-  let deletedIds = new Set<string>();
-  if (typeof window !== "undefined") {
+  if (isTursoConfigured) {
     try {
-      const stored = window.localStorage.getItem("purebengal_deleted_products");
-      if (stored) {
-        deletedIds = new Set(JSON.parse(stored));
+      const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
+      if (rows && rows.length > 0) {
+        const dbProds = rows.map(mapProduct);
+        saveLocalProducts(dbProds);
+        return dbProds;
       }
     } catch {
-      /* ignore */
+      /* fallback */
     }
   }
-
-  try {
-    const rows = await queryRows("SELECT * FROM products ORDER BY sort_order ASC");
-    if (rows && rows.length > 0) {
-      return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
-    }
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
-  } catch {
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
-  }
+  return getLocalProducts();
 }
 
 export async function adminCreateProduct(input: ProductInput): Promise<void> {
@@ -327,37 +337,69 @@ export async function adminCreateProduct(input: ProductInput): Promise<void> {
   const salePrice =
     input.salePrice && !isNaN(Number(input.salePrice)) && Number(input.salePrice) > 0
       ? Number(input.salePrice)
-      : 0;
+      : null;
 
-  await execSql(
-    `INSERT INTO products (
-      id, name, slug, short_description, full_description, category_slug,
-      images, image_public_ids, regular_price, sale_price, sizes, colors,
-      stock, sku, featured, best_seller, new_arrival, active, sort_order, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      id,
-      String(input.name || ""),
-      String(input.slug || ""),
-      String(input.shortDescription || ""),
-      String(input.fullDescription || ""),
-      String(input.categorySlug || ""),
-      JSON.stringify(Array.isArray(input.images) ? input.images : []),
-      JSON.stringify(Array.isArray(input.imagePublicIds) ? input.imagePublicIds : []),
-      regPrice,
-      salePrice,
-      JSON.stringify(Array.isArray(input.sizes) ? input.sizes : []),
-      JSON.stringify(Array.isArray(input.colors) ? input.colors : []),
-      Math.round(Number(input.stock) || 0),
-      String(input.sku || ""),
-      input.featured ? 1 : 0,
-      input.bestSeller ? 1 : 0,
-      input.newArrival ? 1 : 0,
-      input.active ? 1 : 0,
-      Math.round(Number(input.sortOrder) || 0),
-      new Date().toISOString(),
-    ],
-  );
+  const newProduct: Product = {
+    id,
+    name: String(input.name || ""),
+    slug: String(input.slug || ""),
+    shortDescription: String(input.shortDescription || ""),
+    fullDescription: String(input.fullDescription || ""),
+    categorySlug: String(input.categorySlug || ""),
+    images: Array.isArray(input.images) ? input.images.filter(Boolean) : [],
+    imagePublicIds: Array.isArray(input.imagePublicIds) ? input.imagePublicIds.filter(Boolean) : [],
+    regularPrice: regPrice,
+    salePrice,
+    sizes: Array.isArray(input.sizes) ? input.sizes : [],
+    colors: Array.isArray(input.colors) ? input.colors : [],
+    stock: Math.round(Number(input.stock) || 0),
+    sku: String(input.sku || ""),
+    featured: Boolean(input.featured),
+    bestSeller: Boolean(input.bestSeller),
+    newArrival: Boolean(input.newArrival),
+    active: Boolean(input.active),
+    sortOrder: Math.round(Number(input.sortOrder) || 0),
+    createdAt: new Date().toISOString(),
+  };
+
+  const current = getLocalProducts();
+  saveLocalProducts([newProduct, ...current]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        `INSERT INTO products (
+          id, name, slug, short_description, full_description, category_slug,
+          images, image_public_ids, regular_price, sale_price, sizes, colors,
+          stock, sku, featured, best_seller, new_arrival, active, sort_order, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          id,
+          newProduct.name,
+          newProduct.slug,
+          newProduct.shortDescription,
+          newProduct.fullDescription,
+          newProduct.categorySlug,
+          JSON.stringify(newProduct.images),
+          JSON.stringify(newProduct.imagePublicIds),
+          regPrice,
+          salePrice ?? 0,
+          JSON.stringify(newProduct.sizes),
+          JSON.stringify(newProduct.colors),
+          newProduct.stock,
+          newProduct.sku,
+          newProduct.featured ? 1 : 0,
+          newProduct.bestSeller ? 1 : 0,
+          newProduct.newArrival ? 1 : 0,
+          newProduct.active ? 1 : 0,
+          newProduct.sortOrder,
+          newProduct.createdAt,
+        ],
+      );
+    } catch (e) {
+      console.error("Error creating product in DB:", e);
+    }
+  }
 }
 
 export async function adminUpdateProduct(id: string, input: ProductInput): Promise<void> {
@@ -366,57 +408,98 @@ export async function adminUpdateProduct(id: string, input: ProductInput): Promi
   const salePrice =
     input.salePrice && !isNaN(Number(input.salePrice)) && Number(input.salePrice) > 0
       ? Number(input.salePrice)
-      : 0;
+      : null;
 
-  await execSql(
-    `UPDATE products SET
-      name = ?, slug = ?, short_description = ?, full_description = ?, category_slug = ?,
-      images = ?, image_public_ids = ?, regular_price = ?, sale_price = ?, sizes = ?, colors = ?,
-      stock = ?, sku = ?, featured = ?, best_seller = ?, new_arrival = ?, active = ?, sort_order = ?
-    WHERE id = ?`,
-    [
-      String(input.name || ""),
-      String(input.slug || ""),
-      String(input.shortDescription || ""),
-      String(input.fullDescription || ""),
-      String(input.categorySlug || ""),
-      JSON.stringify(Array.isArray(input.images) ? input.images : []),
-      JSON.stringify(Array.isArray(input.imagePublicIds) ? input.imagePublicIds : []),
-      regPrice,
-      salePrice,
-      JSON.stringify(Array.isArray(input.sizes) ? input.sizes : []),
-      JSON.stringify(Array.isArray(input.colors) ? input.colors : []),
-      Math.round(Number(input.stock) || 0),
-      String(input.sku || ""),
-      input.featured ? 1 : 0,
-      input.bestSeller ? 1 : 0,
-      input.newArrival ? 1 : 0,
-      input.active ? 1 : 0,
-      Math.round(Number(input.sortOrder) || 0),
-      String(id),
-    ],
-  );
+  const current = getLocalProducts();
+  const idx = current.findIndex((p) => p.id === id);
+
+  const updatedProduct: Product = {
+    id,
+    name: String(input.name || ""),
+    slug: String(input.slug || ""),
+    shortDescription: String(input.shortDescription || ""),
+    fullDescription: String(input.fullDescription || ""),
+    categorySlug: String(input.categorySlug || ""),
+    images: Array.isArray(input.images) ? input.images.filter(Boolean) : [],
+    imagePublicIds: Array.isArray(input.imagePublicIds) ? input.imagePublicIds.filter(Boolean) : [],
+    regularPrice: regPrice,
+    salePrice,
+    sizes: Array.isArray(input.sizes) ? input.sizes : [],
+    colors: Array.isArray(input.colors) ? input.colors : [],
+    stock: Math.round(Number(input.stock) || 0),
+    sku: String(input.sku || ""),
+    featured: Boolean(input.featured),
+    bestSeller: Boolean(input.bestSeller),
+    newArrival: Boolean(input.newArrival),
+    active: Boolean(input.active),
+    sortOrder: Math.round(Number(input.sortOrder) || 0),
+    createdAt: idx >= 0 ? current[idx].createdAt : new Date().toISOString(),
+  };
+
+  if (idx >= 0) {
+    current[idx] = updatedProduct;
+  } else {
+    current.unshift(updatedProduct);
+  }
+  saveLocalProducts([...current]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        `UPDATE products SET
+          name = ?, slug = ?, short_description = ?, full_description = ?, category_slug = ?,
+          images = ?, image_public_ids = ?, regular_price = ?, sale_price = ?, sizes = ?, colors = ?,
+          stock = ?, sku = ?, featured = ?, best_seller = ?, new_arrival = ?, active = ?, sort_order = ?
+        WHERE id = ?`,
+        [
+          updatedProduct.name,
+          updatedProduct.slug,
+          updatedProduct.shortDescription,
+          updatedProduct.fullDescription,
+          updatedProduct.categorySlug,
+          JSON.stringify(updatedProduct.images),
+          JSON.stringify(updatedProduct.imagePublicIds),
+          regPrice,
+          salePrice ?? 0,
+          JSON.stringify(updatedProduct.sizes),
+          JSON.stringify(updatedProduct.colors),
+          updatedProduct.stock,
+          updatedProduct.sku,
+          updatedProduct.featured ? 1 : 0,
+          updatedProduct.bestSeller ? 1 : 0,
+          updatedProduct.newArrival ? 1 : 0,
+          updatedProduct.active ? 1 : 0,
+          updatedProduct.sortOrder,
+          id,
+        ],
+      );
+    } catch (e) {
+      console.error("Error updating product in DB:", e);
+    }
+  }
 }
 
 export async function adminSetProductActive(id: string, active: boolean): Promise<void> {
   await ensureDbSchema();
-  await execSql("UPDATE products SET active = ? WHERE id = ?", [active ? 1 : 0, id]);
-}
-
-export async function adminDeleteProduct(id: string): Promise<void> {
-  await ensureDbSchema();
-  if (typeof window !== "undefined") {
+  const current = getLocalProducts();
+  const idx = current.findIndex((p) => p.id === id);
+  if (idx >= 0) {
+    current[idx].active = active;
+    saveLocalProducts([...current]);
+  }
+  if (isTursoConfigured) {
     try {
-      const stored = window.localStorage.getItem("purebengal_deleted_products");
-      const deletedIds: string[] = stored ? JSON.parse(stored) : [];
-      if (!deletedIds.includes(id)) {
-        deletedIds.push(id);
-        window.localStorage.setItem("purebengal_deleted_products", JSON.stringify(deletedIds));
-      }
+      await execSql("UPDATE products SET active = ? WHERE id = ?", [active ? 1 : 0, id]);
     } catch {
       /* ignore */
     }
   }
+}
+
+export async function adminDeleteProduct(id: string): Promise<void> {
+  await ensureDbSchema();
+  const current = getLocalProducts();
+  saveLocalProducts(current.filter((p) => p.id !== id));
 
   if (isTursoConfigured) {
     try {
@@ -429,112 +512,304 @@ export async function adminDeleteProduct(id: string): Promise<void> {
 
 /* -------------------------------- categories ------------------------------ */
 
-export type CategoryInput = Omit<Category, "id">;
-
-export async function adminListCategories(): Promise<Category[]> {
+export function getLocalCategories(): Category[] {
+  if (typeof window === "undefined") return defaultCategories;
   try {
-    const rows = await queryRows("SELECT * FROM categories ORDER BY sort_order ASC");
-    if (rows && rows.length > 0) {
-      return rows.map(mapCategory);
+    const raw = window.localStorage.getItem(STORAGE_KEY_CATEGORIES);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
     }
-    return defaultCategories;
   } catch {
-    return defaultCategories;
+    /* ignore */
+  }
+  try {
+    window.localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(defaultCategories));
+  } catch {
+    /* ignore */
+  }
+  return defaultCategories;
+}
+
+export function saveLocalCategories(cats: Category[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(cats));
+  } catch {
+    /* ignore */
   }
 }
 
+export type CategoryInput = Omit<Category, "id">;
+
+export async function adminListCategories(): Promise<Category[]> {
+  await ensureDbSchema();
+  if (isTursoConfigured) {
+    try {
+      const rows = await queryRows("SELECT * FROM categories ORDER BY sort_order ASC");
+      if (rows && rows.length > 0) {
+        const dbCats = rows.map(mapCategory);
+        saveLocalCategories(dbCats);
+        return dbCats;
+      }
+    } catch {
+      /* fallback */
+    }
+  }
+  return getLocalCategories();
+}
+
 export async function adminCreateCategory(input: CategoryInput): Promise<void> {
+  await ensureDbSchema();
   const id = "cat_" + Date.now().toString(36);
-  await execSql(
-    "INSERT INTO categories (id, name, slug, description, image_url, image_public_id, active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [
-      id,
-      input.name,
-      input.slug,
-      input.description,
-      input.image,
-      input.imagePublicId || "",
-      input.active ? 1 : 0,
-      input.sortOrder,
-    ],
-  );
+  const newCat: Category = {
+    id,
+    name: String(input.name || ""),
+    slug: String(input.slug || ""),
+    description: String(input.description || ""),
+    image: String(input.image || ""),
+    imagePublicId: String(input.imagePublicId || ""),
+    active: Boolean(input.active),
+    sortOrder: Number(input.sortOrder) || 0,
+  };
+
+  const current = getLocalCategories();
+  saveLocalCategories([...current, newCat]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        "INSERT INTO categories (id, name, slug, description, image_url, image_public_id, active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          newCat.name,
+          newCat.slug,
+          newCat.description,
+          newCat.image,
+          newCat.imagePublicId,
+          newCat.active ? 1 : 0,
+          newCat.sortOrder,
+        ],
+      );
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export async function adminUpdateCategory(id: string, input: CategoryInput): Promise<void> {
-  await execSql(
-    "UPDATE categories SET name=?, slug=?, description=?, image_url=?, image_public_id=?, active=?, sort_order=? WHERE id=?",
-    [
-      input.name,
-      input.slug,
-      input.description,
-      input.image,
-      input.imagePublicId || "",
-      input.active ? 1 : 0,
-      input.sortOrder,
-      id,
-    ],
-  );
+  await ensureDbSchema();
+  const current = getLocalCategories();
+  const idx = current.findIndex((c) => c.id === id);
+
+  const updatedCat: Category = {
+    id,
+    name: String(input.name || ""),
+    slug: String(input.slug || ""),
+    description: String(input.description || ""),
+    image: String(input.image || ""),
+    imagePublicId: String(input.imagePublicId || ""),
+    active: Boolean(input.active),
+    sortOrder: Number(input.sortOrder) || 0,
+  };
+
+  if (idx >= 0) {
+    current[idx] = updatedCat;
+  } else {
+    current.push(updatedCat);
+  }
+  saveLocalCategories([...current]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        "UPDATE categories SET name=?, slug=?, description=?, image_url=?, image_public_id=?, active=?, sort_order=? WHERE id=?",
+        [
+          updatedCat.name,
+          updatedCat.slug,
+          updatedCat.description,
+          updatedCat.image,
+          updatedCat.imagePublicId,
+          updatedCat.active ? 1 : 0,
+          updatedCat.sortOrder,
+          id,
+        ],
+      );
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export async function adminDeleteCategory(id: string): Promise<void> {
-  await execSql("DELETE FROM categories WHERE id = ? OR slug = ?", [id, id]);
+  await ensureDbSchema();
+  const current = getLocalCategories();
+  saveLocalCategories(current.filter((c) => c.id !== id && c.slug !== id));
+
+  if (isTursoConfigured) {
+    try {
+      await execSql("DELETE FROM categories WHERE id = ? OR slug = ?", [id, id]);
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 /* ---------------------------------- banners ------------------------------- */
 
-export type BannerInput = Omit<Banner, "id">;
-
-export async function adminListBanners(): Promise<Banner[]> {
+export function getLocalBanners(): Banner[] {
+  if (typeof window === "undefined") return defaultBanners;
   try {
-    const rows = await queryRows("SELECT * FROM banners ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return defaultBanners;
-    return rows.map(mapBanner);
+    const raw = window.localStorage.getItem(STORAGE_KEY_BANNERS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
   } catch {
-    return defaultBanners;
+    /* ignore */
+  }
+  try {
+    window.localStorage.setItem(STORAGE_KEY_BANNERS, JSON.stringify(defaultBanners));
+  } catch {
+    /* ignore */
+  }
+  return defaultBanners;
+}
+
+export function saveLocalBanners(banners: Banner[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY_BANNERS, JSON.stringify(banners));
+  } catch {
+    /* ignore */
   }
 }
 
+export type BannerInput = Omit<Banner, "id">;
+
+export async function adminListBanners(): Promise<Banner[]> {
+  await ensureDbSchema();
+  if (isTursoConfigured) {
+    try {
+      const rows = await queryRows("SELECT * FROM banners ORDER BY sort_order ASC");
+      if (rows && rows.length > 0) {
+        const dbBanners = rows.map(mapBanner);
+        saveLocalBanners(dbBanners);
+        return dbBanners;
+      }
+    } catch {
+      /* fallback */
+    }
+  }
+  return getLocalBanners();
+}
+
 export async function adminCreateBanner(input: BannerInput): Promise<void> {
+  await ensureDbSchema();
   const id = "bnr_" + Date.now().toString(36);
-  await execSql(
-    "INSERT INTO banners (id, title, subtitle, cta_label, cta_href, image_url, image_public_id, mobile_image_url, mobile_image_public_id, active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    [
-      id,
-      input.title,
-      input.subtitle,
-      input.ctaLabel,
-      input.ctaHref,
-      input.image,
-      input.imagePublicId || "",
-      input.mobileImage || "",
-      input.mobileImagePublicId || "",
-      input.active ? 1 : 0,
-      input.sortOrder,
-    ],
-  );
+  const newBanner: Banner = {
+    id,
+    title: String(input.title || ""),
+    subtitle: String(input.subtitle || ""),
+    ctaLabel: String(input.ctaLabel || ""),
+    ctaHref: String(input.ctaHref || ""),
+    image: String(input.image || ""),
+    imagePublicId: String(input.imagePublicId || ""),
+    mobileImage: String(input.mobileImage || ""),
+    mobileImagePublicId: String(input.mobileImagePublicId || ""),
+    active: Boolean(input.active),
+    sortOrder: Number(input.sortOrder) || 0,
+  };
+
+  const current = getLocalBanners();
+  saveLocalBanners([...current, newBanner]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        "INSERT INTO banners (id, title, subtitle, cta_label, cta_href, image_url, image_public_id, mobile_image_url, mobile_image_public_id, active, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+          id,
+          newBanner.title,
+          newBanner.subtitle,
+          newBanner.ctaLabel,
+          newBanner.ctaHref,
+          newBanner.image,
+          newBanner.imagePublicId,
+          newBanner.mobileImage,
+          newBanner.mobileImagePublicId,
+          newBanner.active ? 1 : 0,
+          newBanner.sortOrder,
+        ],
+      );
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export async function adminUpdateBanner(id: string, input: BannerInput): Promise<void> {
-  await execSql(
-    "UPDATE banners SET title=?, subtitle=?, cta_label=?, cta_href=?, image_url=?, image_public_id=?, mobile_image_url=?, mobile_image_public_id=?, active=?, sort_order=? WHERE id=?",
-    [
-      input.title,
-      input.subtitle,
-      input.ctaLabel,
-      input.ctaHref,
-      input.image,
-      input.imagePublicId || "",
-      input.mobileImage || "",
-      input.mobileImagePublicId || "",
-      input.active ? 1 : 0,
-      input.sortOrder,
-      id,
-    ],
-  );
+  await ensureDbSchema();
+  const current = getLocalBanners();
+  const idx = current.findIndex((b) => b.id === id);
+
+  const updatedBanner: Banner = {
+    id,
+    title: String(input.title || ""),
+    subtitle: String(input.subtitle || ""),
+    ctaLabel: String(input.ctaLabel || ""),
+    ctaHref: String(input.ctaHref || ""),
+    image: String(input.image || ""),
+    imagePublicId: String(input.imagePublicId || ""),
+    mobileImage: String(input.mobileImage || ""),
+    mobileImagePublicId: String(input.mobileImagePublicId || ""),
+    active: Boolean(input.active),
+    sortOrder: Number(input.sortOrder) || 0,
+  };
+
+  if (idx >= 0) {
+    current[idx] = updatedBanner;
+  } else {
+    current.push(updatedBanner);
+  }
+  saveLocalBanners([...current]);
+
+  if (isTursoConfigured) {
+    try {
+      await execSql(
+        "UPDATE banners SET title=?, subtitle=?, cta_label=?, cta_href=?, image_url=?, image_public_id=?, mobile_image_url=?, mobile_image_public_id=?, active=?, sort_order=? WHERE id=?",
+        [
+          updatedBanner.title,
+          updatedBanner.subtitle,
+          updatedBanner.ctaLabel,
+          updatedBanner.ctaHref,
+          updatedBanner.image,
+          updatedBanner.imagePublicId,
+          updatedBanner.mobileImage,
+          updatedBanner.mobileImagePublicId,
+          updatedBanner.active ? 1 : 0,
+          updatedBanner.sortOrder,
+          id,
+        ],
+      );
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 export async function adminDeleteBanner(id: string): Promise<void> {
-  await execSql("DELETE FROM banners WHERE id = ?", [id]);
+  await ensureDbSchema();
+  const current = getLocalBanners();
+  saveLocalBanners(current.filter((b) => b.id !== id));
+
+  if (isTursoConfigured) {
+    try {
+      await execSql("DELETE FROM banners WHERE id = ?", [id]);
+    } catch {
+      /* ignore */
+    }
+  }
 }
 
 /* ---------------------------------- reviews ------------------------------- */

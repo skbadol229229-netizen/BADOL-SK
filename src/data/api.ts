@@ -4,6 +4,12 @@
 import { queryRow, queryRows } from "@/lib/turso";
 import { ensureDbSchema } from "@/lib/db-schema";
 import {
+  adminFetchSettings,
+  adminListBanners,
+  adminListCategories,
+  adminListProducts,
+} from "@/lib/admin";
+import {
   defaultBanner,
   defaultBanners,
   defaultCategories,
@@ -142,91 +148,27 @@ export function mapSettings(row: Row | null): StoreSettings {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  await ensureDbSchema();
-  try {
-    const rows = await queryRows(
-      "SELECT * FROM categories WHERE active = 1 ORDER BY sort_order ASC",
-    );
-    if (rows && rows.length > 0) {
-      return rows.map(mapCategory);
-    }
-    return defaultCategories;
-  } catch {
-    return defaultCategories;
-  }
+  const cats = await adminListCategories();
+  return cats.filter((c) => c.active);
 }
 
 export async function fetchCategory(slug: string): Promise<Category | null> {
-  await ensureDbSchema();
-  try {
-    const row = await queryRow("SELECT * FROM categories WHERE slug = ? AND active = 1", [slug]);
-    if (!row) return defaultCategories.find((c) => c.slug === slug) ?? null;
-    return mapCategory(row);
-  } catch {
-    return defaultCategories.find((c) => c.slug === slug) ?? null;
-  }
+  const cats = await adminListCategories();
+  return cats.find((c) => c.slug === slug && c.active) ?? null;
 }
 
 export async function fetchBanners(): Promise<Banner[]> {
-  await ensureDbSchema();
-  try {
-    const rows = await queryRows("SELECT * FROM banners WHERE active = 1 ORDER BY sort_order ASC");
-    if (!rows || rows.length === 0) return defaultBanners;
-    return rows.map(mapBanner);
-  } catch {
-    return defaultBanners;
-  }
+  const banners = await adminListBanners();
+  return banners.filter((b) => b.active);
 }
 
 export async function fetchSettings(): Promise<StoreSettings> {
-  await ensureDbSchema();
-  let settings = defaultSettings;
-  try {
-    const row = await queryRow("SELECT * FROM store_settings LIMIT 1");
-    if (row) {
-      settings = mapSettings(row);
-    }
-  } catch {
-    /* fallback to default */
-  }
-
-  if (typeof window !== "undefined") {
-    try {
-      const stored = window.localStorage.getItem("purebengal_store_settings");
-      if (stored) {
-        settings = { ...settings, ...JSON.parse(stored) };
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-
-  return settings;
+  return await adminFetchSettings();
 }
 
 async function fetchActiveProducts(): Promise<Product[]> {
-  await ensureDbSchema();
-  let deletedIds = new Set<string>();
-  if (typeof window !== "undefined") {
-    try {
-      const stored = window.localStorage.getItem("purebengal_deleted_products");
-      if (stored) {
-        deletedIds = new Set(JSON.parse(stored));
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-
-  try {
-    const rows = await queryRows("SELECT * FROM products WHERE active = 1 ORDER BY sort_order ASC");
-    if (rows && rows.length > 0) {
-      return rows.map(mapProduct).filter((p) => !deletedIds.has(p.id));
-    }
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
-  } catch {
-    return defaultProducts.filter((p) => !deletedIds.has(p.id));
-  }
+  const prods = await adminListProducts();
+  return prods.filter((p) => p.active);
 }
 
 /** Lowercases and strips punctuation so "T-Shirt" matches "tshirt". */
@@ -304,71 +246,20 @@ export async function fetchProducts(filters: ProductFilters = {}): Promise<Produ
 }
 
 export async function fetchProduct(slug: string): Promise<Product | null> {
-  await ensureDbSchema();
-  let deletedIds = new Set<string>();
-  if (typeof window !== "undefined") {
-    try {
-      const stored = window.localStorage.getItem("purebengal_deleted_products");
-      if (stored) {
-        deletedIds = new Set(JSON.parse(stored));
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-
-  try {
-    const row = await queryRow("SELECT * FROM products WHERE slug = ? AND active = 1", [slug]);
-    if (row) {
-      const prod = mapProduct(row);
-      if (!deletedIds.has(prod.id)) return prod;
-    }
-  } catch {
-    /* fallback */
-  }
-
-  const def = defaultProducts.find((p) => p.slug === slug);
-  if (def && !deletedIds.has(def.id)) return def;
-  return null;
+  const prods = await fetchActiveProducts();
+  return prods.find((p) => p.slug === slug) ?? null;
 }
 
 export async function fetchRelated(product: Product): Promise<Product[]> {
-  let deletedIds = new Set<string>();
-  if (typeof window !== "undefined") {
-    try {
-      const stored = window.localStorage.getItem("purebengal_deleted_products");
-      if (stored) {
-        deletedIds = new Set(JSON.parse(stored));
-      }
-    } catch {
-      /* ignore */
-    }
-  }
+  const allActive = await fetchActiveProducts();
+  const sameCat = allActive.filter(
+    (p) => p.categorySlug === product.categorySlug && p.id !== product.id,
+  );
+  if (sameCat.length >= 4) return sameCat.slice(0, 4);
 
-  try {
-    const rows = await queryRows(
-      "SELECT * FROM products WHERE active = 1 AND category_slug = ? AND id != ? ORDER BY sort_order ASC LIMIT 4",
-      [product.categorySlug, product.id],
-    );
-    let list = (rows || []).map(mapProduct).filter((p) => !deletedIds.has(p.id));
-
-    if (list.length < 4) {
-      const existingIds = new Set([product.id, ...list.map((p) => p.id)]);
-      const otherRows = await queryRows(
-        "SELECT * FROM products WHERE active = 1 AND id != ? ORDER BY sort_order ASC LIMIT 12",
-        [product.id],
-      );
-      if (otherRows && otherRows.length > 0) {
-        const others = otherRows
-          .map(mapProduct)
-          .filter((p) => !existingIds.has(p.id) && !deletedIds.has(p.id));
-        list = [...list, ...others.slice(0, 4 - list.length)];
-      }
-    }
-    return list;
-  } catch {
-    return [];
-  }
+  const existingIds = new Set([product.id, ...sameCat.map((p) => p.id)]);
+  const others = allActive.filter((p) => !existingIds.has(p.id));
+  return [...sameCat, ...others].slice(0, 4);
 }
 
 export async function fetchReviews(slug: string): Promise<Review[]> {
